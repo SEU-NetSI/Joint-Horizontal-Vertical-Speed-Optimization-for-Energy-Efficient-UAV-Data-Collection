@@ -1,0 +1,5 @@
+{
+  "editor.wordWrap": "on",
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  "latex-workshop.linting.chktex.enabled": false
+}

@@ -1,0 +1,167 @@
+ \section{Simulation}
+\label{sec:simulation}
+
+To rigorously evaluate the performance of our proposed joint horizontal-vertical speed optimization algorithm, we consider a multi-rotor UAV deployed for distributed ground nodes data collection missions.
+
+The power consumption of the UAV during horizontal flight is captured by a realistic, empirically validated non-linear function of its forward velocity $v$, expressed as $P_\parallel(v) = c_1 v^3 + c_2 v^2 + c_3 v + P_{mh}$.
+Based on empirical flight test configurations from~\cite{Energy-Efficient-POI}, the non-linear coefficients are specified as $c_1 = 0.07$, $c_2 = 0.0391$, and $c_3 = -13.196$, with the baseline hovering power $P_{mh}$ being $390.95$ W .
+For vertical flight, we use Eq.~(\ref{equ:v_1}) with $k_1 = 0.8554$, $k_2 = 1.9051$, $c_1 = 0.3177$, and $mg = 63.81\,\mathrm{N}$.
+The parameters $k_1$ and $c_1$ are adopted from~\cite{PowerConsumptionModel}, while $k_2$ and $mg$ are calibrated to give a hovering power of approximately $390.8\,\mathrm{W}$, close to the horizontal model's $P_{mh}=390.95\,\mathrm{W}$.
+The horizontal and vertical speeds of the UAV are restricted to $V_{\parallel}^{\max} = 20$ m/s and $V_{\perp}^{\max} = 10$ m/s, respectively, while its maximum-range speed-defined as the speed that maximizes aerodynamic efficiency-is determined to be $v_{\mathrm{best}} = 13.99$ m/s by minimizing $P_{\parallel}(v_{\parallel})/v_{\parallel}$.
+
+In our simulation environment, a set of ground nodes (GNs) are deployed along a straight-line, and each $GN_i$ is assigned a random coordinate along the axis.
+By default, the total number of GNs, denoted as $N_{GN}$, is set to 20, with spacing between consecutive GNs averaging 60 m.
+To emulate realistic deployment heterogeneity, the parameters associated with each GN are not fixed to a single global value: as listed in \textit{Table. \ref{tbl:parameters}}, the parameter of each individual GN is independently and uniformly sampled within its per-GN variation range, so that different GNs within the same mission exhibit heterogeneous communication coverages and data requirements.
+On this basis, each controlled experiment varies the default value of one parameter (or two coupled parameters, as in Fig.~(\ref{fig:sim})(f)) at a time, while all the remaining parameters follow the default configuration with the per-GN randomization preserved.
+
+\begin{table}%[]
+\caption{Default parameter setting.
+The \emph{default value} is the mean used when a parameter is not being scanned; the \emph{per-GN variation range} is the uniform sampling interval for each individual GN.
+In each controlled experiment, only the default value of the scanned parameter is varied, while all other parameters are sampled per GN from their variation ranges.}\label{tbl:parameters}
+\begin{tabular*}{\tblwidth}{lcc}
+\toprule
+ Parameter & Default & Variation Range \\ % Table header row
+\midrule
+ Average\ $PL\ (dB)$ & 85  & [83 86]\\
+ Average\ $\tau\ (s)$ & 22 & [18 25]\\
+ Parameter\ $\mu _{LoS}\ (dB)$& 1.3 & [1 1.6]\\
+ Parameter\ $\mu _{NLoS}\ (dB)$& 35 & -\\
+ Average distance\ $(m)$& 60 & [30 80]\\
+ Parameter\ $a$& 45 & [42 47]\\
+ Parameter\ $b$& 0.25 & [0.2 0.3]\\
+ Average\ number\ of\ $GN$& 20 & -\\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+
+The air-to-ground wireless links between the flying UAV and the GNs are characterized by the communication model to account for typical urban blocking and shadowing effects.
+The probability of establishing an LoS link depends heavily on the elevation angle $\theta$ between the UAV and the target GN, which is mathematically given by Eq.~(\ref{equ:PL}), where the environment-specific parameters are selected as $a = 45$ and $b = 0.25$.
+The wireless communication operates at a standard carrier frequency of $f = 2.4 GHz$, with the speed of light defined as $c = 3 \times 10^8$ m/s.
+The average excessive path losses for LoS and Non-Line-of-Sight (NLoS) connections are configured as $\mu_{LoS} = 1.3$ dB and $\mu_{NLoS} = 35$ dB, respectively.
+A communication link is deemed valid and available for data upload if and only if the total path loss remains below a maximum allowable threshold of $PL = 85$ dB, which defines the continuous geometric coverage boundary shape for each GN.
+
+Each experimental configuration is repeated over $K = 5$ independent trials.
+In every trial, the GN positions and the per-GN parameters are re-sampled uniformly from the variation ranges listed in \textit{Table.\ref{tbl:parameters}}, and the reported energy is the average over the $K$ trials.
+The starting altitude is an exogenous mission constraint: the UAV departs and terminates at an altitude of $50$ m in the simulations of Sections~6.1--6.2, and at $100$ m in the real-world case study of Section~6.3.
+
+% \begin{figure*}%[]
+%   \centering
+%    \includegraphics[width = 1\linewidth]{figures/simulation-comparison-alternative.png}
+%     \caption{ }\label{fig1}
+% \end{figure*}
+\subsection{Baseline Algorithms}
+We compare our proposed method with following base-line algorithms
+\begin{itemize}
+    \item \textit{ASSUME~\cite{assume}}: The ASSUME algorithm tackles the joint altitude and speed scheduling problem by discretizing the allowable 3D flight space.
+    It quantizes the UAV's flight altitude into a finite set of horizontal segments.
+    Within each fixed-altitude layer, it employs the Looking-Before-Crossing (LbC) technique to trace a shortest-path speed schedule across virtual spatial-temporal constraints.
+    A dynamic programming (DP) framework is then superimposed to compute the optimal path across these different altitude levels.
+    While ASSUME achieves mathematical optimality within its discrete framework, its performance is inherently bottlenecked by the resolution of its pre-defined altitude grid, often suffering from quantization errors that preclude finding the true continuous energy minimum.
+    \item \textit{MSMO~\cite{msmo}}: This baseline introduces a speed scheduling that at any given iteration $t$, the UAV's horizontal velocity is dynamically evolved according to the rule: $v^{t}=v^{t-1}+R_{1}(v^{*}-v^{t-1})+R_{2}(1-A)(v_{max}-v_{min})$, where $R_{1}$ and $R_{2}$ are randomized tuning weights.
+    The second term explicitly exploits the search space by pulling the speed toward the theoretical optimum $v^{*}$, whereas the third term injects random velocity perturbations to prevent the algorithm from stagnating in local energy minima.
+    To handle the 3D environment, this iterative speed evolution is exhaustively repeated across all discrete altitude layers, ultimately outputting the altitude-speed pair that yields the lowest empirical energy cost.
+    \item \textit{ACO~\cite{bi-aco}}: This approach decouples the scheduling dimensions, applying a deterministic rule for horizontal speed and a ACO based framework for vertical altitude.
+    The horizontal transit speed over any target node $g_{i}$ is strictly dictated by the effective transmission range, calculated as $(f_{i}-\max(s_{i}, f_{i-1})) / \tau_{i}$.
+    For the vertical dimension, an Ant Colony Optimization mechanism simulates pheromone deposition and heuristic path generation to navigate the discrete altitude levels.
+    \item \textit{noSpeedAltitude}: Serving as a naive, worst-case benchmark, this algorithm entirely eliminates global dynamic optimization.
+    Identical to the ACO method, the UAV's horizontal velocity is locked to a rudimentary calculation based on the effective transmission range and required time $\tau_{i}$.
+    However, its altitude selection is reduced to a purely greedy mechanism: at each GN transition, the algorithm simply scans all feasible altitudes and forcibly selects the one that physically maximizes the geometric transmission coverage radius.
+\end{itemize}
+\begin{figure*}%[]
+  \centering
+   \includegraphics[width = 1.\linewidth]{figures/simulation-comparison.png}
+    \caption{The UAV energy consumption of different algorithm.
+    In (a), as the average path loss threshold getting larger, the energy consumption of all methods fluctuates with the increase of parameters, but the overall energy consumption for each method is basically unchanged.
+    In (b), with the increasing in the environment parameter $b$ , all methods have the decrease in energy consumption at first ,then the energy consumption of all methods gradually stabilized after the parameters rose to a certain extent.
+    In (c), the energy consumption for each methods increases constantly with more ground nodes are added to the mission.
+    In (d), all methods have the increase in energy consumption as the average time to complete data collection from one ground node increases.
+    (e) and (f), show the results of how energy consumption of all methods changes if the distance between each ground nodes increases.
+    For (e), the $\tau$ remain the default value in all groups of experiments, and we can see that all methods have decrease in energy consumption if the average distance between GNs is less than 60 ,after that the MSMO and ACO methods have the increase.
+    For (f), the $\tau$ getting larger with the distance increases , we can see that the energy consumption for all methods increases.
+    JHVSO achieves the lowest energy consumption in all 34 configurations, reducing energy by 1.8\%--5.1\% over the strongest baseline (ASSUME), 3.3\%--9.2\% over ACO, and 4.2\%--14.8\% over the greedy speed--height baseline (noSpeedAltitude).}\label{fig:sim}
+\end{figure*}
+\subsection{Simulation Results and Comparative Analysis}
+
+
+Fig.~(\ref{fig:sim}) presents a comprehensive performance evaluation of the proposed \textit{JHVSO} algorithm alongside four baseline methods: ASSUME, MSMO, ACO, and noSpeedAltitude.
+
+To thoroughly investigate the adaptability and robustness of these algorithms under diverse operational environments, we conduct six controlled experiments following the protocol of \textit{Table 1}: in each subfigure, the x-axis denotes the varied default value of the corresponding parameter, while the per-GN randomization within the variation ranges of \textit{Table 1} is preserved.
+
+In Fig.~(\ref{fig:sim})(a),  we compare the energy consumption of different methods as the average path loss threshold $PL$  increases from $82.5 dB$ to $85 dB$.
+The path loss threshold defines the spatial extent of the communication coverage.
+As shown in the figure, the energy consumption of every method fluctuates slightly with $PL$  but remains essentially unchanged overall, indicating that once the coverage is sufficiently large to accommodate feasible collection windows, further relaxing the threshold brings marginal benefit to energy-optimal scheduling.
+The residual fluctuation is attributable to the per-GN randomization of the deployment rather than to any systematic trend.
+Notably, the relative ranking of the five methods is stable across all threshold settings, with the proposed JHVSO algorithm consistently achieving the lowest energy consumption. 
+Quantitatively, JHVSO reduces energy consumption by 1.8\%-3.0\% over ASSUME (the strongest competing baseline), by 3.6\%-4.8\ over ACO, and by 4.7\%-6.9\% over the greedy noSpeedAltitude baseline; the largest margin occurs at $PL=84.5$ dB, where JHVSO consumes $1.61\times10^{5}$ J against $1.73\times10^{5}$ J of noSpeedAltitude, i.e., a 6.9\% energy saving.
+
+In Fig.~(\ref{fig:sim})(b), demonstrates the effect of the environmental parameter $b$, which conrtols the sensitivity of $LoS$ probability to the elevation angle in Eq.~(\ref{equ:PL}).
+An increase in $b$  raises the $LoS$ probability at a given elevation angle and thereby effectively expands the communication coverage, providing the UAV with larger feasible windows for data collection.
+Consequently, the energy consumption of all methods first decreases as $b$  grows from 0.2 to 0.26.
+Beyond this point, however, the $LoS$ probability gradually saturates—as the sigmoid in Eq.~(\ref{equ:PL}) approaches its upper limit—so that the coverage barely expands any further and the energy consumption of all methods stabilizes.
+Throughout this sweep, JHVSO maintains the lowest energy footprint, reducing consumption by 2.4\%-3.0\% over ASSUME, by 3.0\%-5.3\% over MSMO, and by 5.8\%-7.1\% over noSpeedAltitude; the peak reduction of 7.1\% is observed at $b=0.3$ ($1.58\times10^{5}$ J versus$1.70\times10^{5}$ J).
+
+As depicted in Fig.~(\ref{fig:sim})(c) and Fig.~(\ref{fig:sim})(d), the energy consumption of all evaluated methods scales upward under increasing mission workloads.
+Specifically, Fig.~(\ref{fig:sim})(c) shows a monotonic rise in total energy expenditure as more GNs are integrated into the flight mission.
+across alldeployment scales from 20 to 40 GNs, ORE reduces energy consumption by 1.9\%-3.0\% over ASSUME, by 3.9\%-4.8\% over ACO, and by 4.2\%-7.0\% over noSpeedAltitude, with the largest gain (7.0\%) achieved at the 20-GN scale ($1.60\times10^{5}$ J versus $1.72\times10^{5}$ J). 
+Similarly, Fig.~(\ref{fig:sim})(d) indicates that extending the average minimum required data collection time ($\tau$) per GN intrinsically demands prolonged flight or hovering durations, thereby consistently elevating the overall energy consumption across all algorithms.
+This setting yields the most pronounced relative advantage of JHVSO among all experiments: the energy reduction reaches 5.1\% over ASSUME, 9.2\% over ACO, and 14.8\% over noSpeedAltitude at $\tau=10$ s ($6.35\times10^{4}$ J versus $6.69\times10^{4}$ J, $6.99\times10^{4}$ J, and $7.45\times10^{4}$ J, respectively). As $\tau$ grows to 30 s, the collection time progressively dominates the total mission energy, so the relative margins narrow to 2.3\% (ASSUME) and 5.7\% (noSpeedAltitude), yet JHVSO remains the most energy-efficient method at every data point.
+
+Fig.~(\ref{fig:sim})(e) and Fig.~(\ref{fig:sim})(f) explore the algorithmic performance as the average distance between GNs increases.
+In Fig.~(\ref{fig:sim})(e), the required task time $\tau$ is kept constant.
+As the inter-node distance grows, the UAV is compelled to increase its average transit speed, which better aligns with the optimal aerodynamic cruising speed.
+Provided the gap segments between nodes are not excessively long, the total mission duration remains relatively stable, allowing the proposed method, ASSUME, and noSpeedAltitude to achieve continued energy reductions.
+Conversely, MSMO and ACO exhibit a performance degradation when the average distance exceeds 60 m, indicating a higher susceptibility to suboptimal scheduling within extended gap segments.
+JHVSO's advantage over MSMO widens from 3.7\% at 60 m to 6.7\% at 80-90 m. Over the whole sweep, JHVSO reduces energy consumption by 2.5\%-3.6\% over ASSUME and by 6.6\%-8.1\% over noSpeedAltitude, with the maximum saving of 8.1\% occurring at the 40 m spacing ($1.59\times10^{5}$ J versus $1.73\times10^{5}$ J).
+In Fig.~(\ref{fig:sim})(f), $\tau$ scales proportionally with the inter-node distance (fixed ratio of 0.5).
+Under this coupled constraint, the extended spatial traversal strictly mandates a correspondingly longer mission duration, resulting in a predictable and consistent increase in energy consumption across all methods.
+Even so, JHVSO reduces energy consumption by 1.9\%-3.9\% over ASSUME and by 4.3\%-8.1\% over noSpeedAltitude, again peaking at 8.1\% for the 40 m spacing ($1.48\times10^{5}$ J versus $1.61\times10^{5}$ J).
+
+In summary, throughout all 34 experimental configurations in Fig.~(\ref{fig:sim}), the proposed JHVSO method consistently maintains the lowest energy consumption footprint, reducing energy consumption by up to 14.8\% over the greedy speed-height baseline and by up to 5.1\% over the strongest competing baseline.
+
+\subsection{Real World Scenario Case Study}
+
+\begin{figure}%[]
+  \centering
+   \includegraphics[width = 1\linewidth]{figures/real-world-scenario.png}
+    \caption{The traffic CCTVs at M5, Bromsgrove, England, United Kingdom~\cite{UKLiveCamera}}\label{fig:real_scenario}
+\end{figure}
+
+\begin{table}%[]
+\caption{Per-segment speed schedule of the \textit{JHVSO}-planned trajectory in the real-world scenario.}\label{tbl2}
+\begin{tabular*}{\tblwidth}{lcccr}
+\toprule
+ Segment & Type & $v_\parallel (m/s)$ & $v_\perp$ & Duration (s) \\ % Table header row
+\midrule
+$GN_1$ & Task  & 7.00  & 0.57  & 21.00\\
+$GN_2$ & Gap   & 13.94 & 0.80  & 28.76\\
+$GN_2$ & Task  & 12.17 & -0.17 & 18.00\\
+$GN_3$ & Gap   & 13.94 & -1.16 & 14.70\\
+$GN_3$ & Task  & 11.40 & -0.25 & 20.00\\
+$GN_4$ & Task(direct)  & 8.86  & -0.09 & 22.00\\
+$GN_5$ & Task(direct)  & 12.89 & -0.21 & 19.00\\
+$GN_6$ & Gap   & 13.96 & 0.38  & 7.81 \\
+$GN_6$ & Task  & 8.94  & 0.24  & 17.00 \\
+$GN_7$ & Task(direct)  & 9.17  & -0.25 & 12.00 \\
+$GN_8$ & Gap   & 13.92 & -1.63 & 9.20 \\
+$GN_8$ & Task  & 7.09  & 0.05  & 22.00 \\
+$GN_9$ & Gap   & 13.96 & 0.07  & 14.54 \\
+$GN_9$ & Task  & 7.18  & -0.09 & 22.00 \\
+$GN_{10}$ & Gap   & 13.96 & -0.20 & 10.10 \\
+$GN_{10}$ & Task  & 6.95  & 0.47 & 19.00 \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+We conduct a simulation using the real-world dataset, contains 10 public traffic CCTV cameras places at high way in Deciduous Broadleaf, England ,United Kingdom.
+We assume that the UAV is deployed to collect data from these cameras.
+Then by using our proposed \textit{JHVSO} algorithm, we scheduled the speed and altitude use for the mission , the UAV is constrained to start the mission at an altitude of 100 m at the first GN (i.e., $h_{0} = 100m$ in \textit{Definition. \ref{def:JHVSO}}), and the trajectory terminates at an altitude of 100 m within the communication region of the last GN.
+
+\textit{Table. \ref{tbl2}} details the speed schedule of the planned trajectory on a per-segment basis.
+In the Gap segments, the UAV cruises at horizontal speeds of $13.92-13.96 m/s$ with small vertical components bounded within $\pm 1.63 m/s$, and the segment durations range from $7.81 s$ to $28.76 s$, varying with the spacing between the coverage regions of adjacent GNs.
+In the Task segments, the UAV slows down to $6.95-12.89 m/s$, and the duration of each Task segment equals the required collection time of the corresponding GN.
+Notably, the transitions toward $GN_5$ and $GN_7$ contain no Gap segment, as the UAV has not yet left the communication coverage of the next GN upon finishing the previous collection task.
+Overall, the mission is completed in $278 s$, of which $85.1 s\ (\approx30 \%)$ is spent on inter-node cruising.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

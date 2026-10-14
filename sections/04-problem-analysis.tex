@@ -1,0 +1,251 @@
+\section{Problem Properties and  Analysis}
+\label{sec:problemanalysis}
+
+\subsection{Optimality Properties}
+
+Before analyzing the \textit{JHVSO} problem, we first examine the flight energy consumption model and establish several properties that characterize energy-optimal UAV motion.
+
+We begin with the fundamental case in which a UAV flies between two given points.
+Even in this setting, minimizing flight energy is nontrivial because the horizontal and vertical velocity components must be jointly considered.
+To address this coupling, we exploit the convexity of the UAV flight energy consumption model to reduce the resulting functional optimization problem to a low-dimensional scalar search.
+
+The following lemmas and theorems provide the theoretical basis for this reduction by establishing that constant-velocity, straight-line flight attains the minimum energy consumption for each trajectory segment.
+
+\begin{lemma}
+\label{lem:horizontal-constant-speed}
+Consider two points $A$ and $B$ at the same altitude ($\Delta H_{AB} = 0$) with horizontal distance $D_{AB}$.
+Among all horizontal speed profiles $v_{\parallel}(t) \ge 0$ that move the UAV from $A$ to $B$ within a time interval $\tau$, the constant-speed profile $v_{\parallel}^{*} \equiv D_{AB}/\tau$ is the unique energy minimizer.
+\end{lemma}
+
+\begin{proof}
+    For any feasible profile $v_{\parallel}(t) = \dot{d}(t)$, where $\dot{d}(t)$ denotes the horizontal velocity at time $t$, the energy consumption and the endpoint constraint read
+    
+    \begin{equation}
+    E = \int_{0}^{\tau} P_{\parallel}(v_{\parallel}(t))\,dt \quad \text{subject to} \quad \int_{0}^{\tau} v_{\parallel}(t)\,dt = D_{AB}
+    \label{eq:lem3}
+    \end{equation}
+    
+    By \textit{Lemma. \ref{lem:hor}}, $P_{\parallel}$ is strictly convex on $v_{\parallel} \ge 0$.
+    Applying Jensen's inequality in its integral form with respect to the probability measure $dt/\tau$ on $[0, \tau]$,
+
+    \begin{equation}
+        \frac{1}{\tau}\int_{0}^{\tau} P_{\parallel}(v_{\parallel}(t))\,dt \;\ge\; P_{\parallel}\!\left(\frac{1}{\tau}\int_{0}^{\tau} v_{\parallel}(t)\,dt\right) = P_{\parallel}\!\left(\frac{D_{AB}}{\tau}\right)
+        \label{eq:lem3-jensen}
+    \end{equation}
+    where strict convexity implies that equality holds if and only if $v_{\parallel}(t)$ is constant almost everywhere.
+    Therefore $E \ge \tau\, P_{\parallel}(D_{AB}/\tau)$, and the bound is attained uniquely by the feasible profile $v_{\parallel}^{*} \equiv D_{AB}/\tau$ (note $D_{AB}/\tau \ge 0$, so the non-negativity constraint is never active).
+    Any non-constant profile-including any piecewise-constant one-is strictly suboptimal.
+\qed
+\end{proof}
+
+\begin{lemma}
+\label{lem:vertical-constant-speed}
+Consider two points $A$ and $B$ with altitude difference $\Delta H_{AB} \neq 0$ (climbing if $\Delta H_{AB} > 0$ and descending otherwise).
+Among all vertical speed profiles that move the UAV from $A$ to $B$ within a time interval  $\tau$, the constant-speed profile $v_{\perp}^{*} \equiv \Delta H_{AB}/\tau$ is the unique energy minimizer.
+\end{lemma}
+
+\begin{proof}
+    The argument parallels \textit{Lemma. \ref{lem:horizontal-constant-speed}}.
+    Any feasible vertical profile $v_{\perp}(t) = \dot{h}(t)$ satisfies $\int_{0}^{\tau} v_{\perp}(t)\,dt = \Delta H_{AB}$ and consumes energy 
+    \[E = \int_{0}^{\tau} P_{\perp}(v_{\perp}(t))\,dt.\]
+    By \textit{Lemma. \ref{lem:ver}}, $P_{\perp}$ is strictly convex on the entire real line, which covers both climbing ($v_{\perp} > 0$) and descending ($v_{\perp} < 0$) flight.
+    Jensen's inequality in its integral form with respect to $dt/\tau$ then yields
+    \[
+    E \;\ge\; \tau\, P_{\perp}\!\left(\frac{\Delta H_{AB}}{\tau}\right)
+    \]
+    with equality if and only if $v_{\perp}(t) \equiv \Delta H_{AB}/\tau$ almost everywhere.\qed
+\end{proof}
+
+\begin{theorem}
+\label{thm:constant-speed}
+Given two points $A$ and $B$ with horizontal distance $D_{AB}$ and altitude difference $\Delta H_{AB}$, and a time interval $\tau$, the energy optimal trajectory from $A$ to $B$ is the constant velocity straight line flight
+\[v_{\parallel}^{*} \equiv \frac{D_{AB}}{\tau}, \qquad v_{\perp}^{*} \equiv \frac{\Delta H_{AB}}{\tau}\]
+\end{theorem}
+
+\begin{proof}
+    By Eq.~(\ref{equ:e_1}), the total energy of any trajectory $q(\cdot)$ decomposes as
+    \begin{align}
+    E(q)
+    &= \int_{0}^{\tau}\!\big[P_{mh} + \Delta P_{\parallel}(v_{\parallel}(t)) + \Delta P_{\perp}(v_{\perp}(t))\big]\,dt \notag\\
+    &= \tau P_{mh} + \underbrace{\int_{0}^{\tau}\!\Delta P_{\parallel}(v_{\parallel}(t))\,dt}% 
+    _{\text{depends on } v_{\parallel}(\cdot) \text{ only}} + \underbrace{\int_{0}^{\tau}\!\Delta P_{\perp}(v_{\perp}(t))\,dt}%
+    _{\text{depends on } v_{\perp}(\cdot) \text{ only}}
+    \label{eq:thm1-decomp}
+    \end{align}
+    The endpoint constraints separate in exactly the same way: the horizontal profile $v_{\parallel}(\cdot)$ is constrained only by $\int_{0}^{\tau} v_{\parallel}(t)\,dt = D_{AB}$, and the vertical profile $v_{\perp}(\cdot)$ only by $\int_{0}^{\tau} v_{\perp}(t)\,dt = \Delta H_{AB}$.
+    Since both the objective function and the feasible set are separable in $(v_{\parallel}(\cdot), v_{\perp}(\cdot))$, the joint minimization decomposes into two independent single-component sub-problems.
+    By \textit{Lemmas. \ref{lem:horizontal-constant-speed} and~\ref{lem:vertical-constant-speed},} the two sub-problems are uniquely solved by $v_{\parallel}^{*} \equiv D_{AB}/\tau$ and $v_{\perp}^{*} \equiv \Delta H_{AB}/\tau$, respectively.
+    The two component optima are attained simultaneously, so the composite motion, a constant velocity straight line flight in the $(d,h)$ plane, is the unique global minimizer, with minimum energy
+    \[
+    E^{*} = \tau\Big[P_{mh} + \Delta P_{\parallel}\!\Big(\frac{D_{AB}}{\tau}\Big) + \Delta P_{\perp}\!\Big(\frac{\Delta H_{AB}}{\tau}\Big)\Big]
+    \]\qed
+\end{proof}
+
+The optimal energy consumption per unit distance is pre-computed and stored in a look-up function $\mathrm{LUT}(\gamma)$, where $\gamma \in (-\pi/2, \pi/2)$ denotes the pitch angle of the flight direction.
+For a straight-line flight at total speed $V$ and pitch angle $\gamma$, the horizontal and vertical velocity components are $v_{\parallel} = V\cos\gamma$ and $v_{\perp} = V\sin\gamma$, respectively.
+Each component is subject to its own speed limit in \textit{Definition. \ref{def:JHVSO}}, i.e., $v_{\parallel} \in [0, V_{\parallel}^{\max}]$ and $|v_{\perp}| \le V_{\perp}^{\max}$.
+The bound on the total speed $V$ in the following minimization is therefore a shorthand for these two component-wise constraints: the admissible total speed at pitch angle $\gamma$ is
+
+\[
+V(\gamma) = \left\{\, V > 0 \;:\; V\cos\gamma \le V_{\parallel}^{\max},\; |V\sin\gamma| \le V_{\perp}^{\max} \,\right\},
+\]
+
+and the optimal energy consumption per unit distance is
+\begin{equation}
+    LUT(\gamma) = \min_{0 < V \le V_{max}} \left( \frac{\Delta P_{\perp}(\sin\gamma \cdot V) + \Delta P_{\parallel}(\cos\gamma \cdot V) + P_{mh}}{V} \right)
+    \label{equ:lut}
+\end{equation}
+
+\begin{remark}[Speed selection under $\tau_i$ constraints]
+\label{rem:task-speed}
+    The data collection duration $\tau_i$ in \textit{Definition. \ref{def:JHVSO}} is a \textit{minimum} requirement: the UAV may stay inside the communication region of $GN_i$ for longer than $\tau_i$.
+    Hence, for a task segment of length $L$ at pitch angle $\gamma$, the nominal speed $L/\tau_i$ acts as an upper bound rather than an exact prescription.
+    Minimizing $E(T) = T\, P_{total}(L/T)$ over all feasible durations $T \ge \tau_i$ yields the optimal segment speed
+    \[
+    V^{task} = \min\big\{ L/\tau_i,\; V^{*}(\gamma) \big\},
+    \]
+    where $V^{*}(\gamma)$ is the energy-optimal cruising speed given by the LUT in Eq.~(\ref{equ:lut}).
+    When $L/\tau_i > V^{*}(\gamma)$, the UAV cruises at $V^{*}(\gamma)$ and the segment duration extends to $L/V^{*}(\gamma) > \tau_i$; this remains feasible and is strictly more energy-efficient than flying at $L/\tau_i$, since the energy per unit distance increases beyond $V^{*}(\gamma)$.
+    When $L/\tau_i \le V^{*}(\gamma)$, the duration constraint binds and the optimal speed is $L/\tau_i$, as in Theorem~\ref{thm:constant-speed}.
+    In both cases the optimal profile remains a constant-velocity straight-line flight, and the segment cost is
+    \begin{equation}
+    C_{task} = \frac{L}{V_{task}}\, P_{total}\big(V_{task}\cos\gamma,\; V_{task}\sin\gamma\big).\label{eq:ctask}
+    \end{equation}
+    Since flying slower is always allowed, $V_{task} \le V_{*}(\gamma)$ guarantees that the component-wise speed limits are never violated: no task segment is infeasible on speed grounds.
+\end{remark}
+
+\begin{theorem}
+\label{thm:optimal-range-speed}
+For any flight distance and height, the flight time is not given, the optimal speed arrangement between two points A and B is using the optimal energy consumption speed per unit distance corresponding to the pitch angle formed by AB.
+\end{theorem}
+
+\begin{proof}
+See Appendix~\ref{pro:Theorem optimal-range-speed}.
+\qed
+\end{proof}
+
+
+
+
+\subsection{Problem Analysis}
+
+The Joint horizontal-vertical speed optimization (\textit{JHVSO}) problem formulated in subsection~\ref{subsection:problem} presents significant theoretical and computational challenges.
+The primary complexity stems from the non-linear coupling among three orthogonal domains: the horizontal spatial domain (d), the vertical spatial domain (h), and the temporal domain (t).
+In the traditional LbC framework~\cite{lbc}, the communication window is a fixed horizontal interval because the altitude $h$ is assumed constant.
+In our 3D formulation, however, the feasible communication window along the $d$-axis contracts or expands dynamically as a function of $f(h)-s(h)$.
+This altitude-dependent scheduling renders complicated, is hard to optimized.
+
+To decouple this complex high-dimensional structure, we partition the mission along the ordered sequence of ground nodes.
+Formally, stage $i\ (i=1,2,\cdots ,N)$ denotes the phase of the mission that begins upon the completion of the data collection for $GN_{i-1}$ and ends upon the completion of the data collection for $GN_i$, with the departure from the initial deployment position marking the beginning of stage 1.
+Under this staged decomposition, we transform the global continuous trajectory optimization problem into finding an optimal discrete sequence of states across sequential ground nodes.
+
+
+\begin{definition}[UAV state]\label{def:state}
+    For each ground node $GN_i$, the continuous feasible transmission region is discretized into a finite set of candidate points.
+    A state of the UAV at stage $i$, denoted as $S_{i,n}$, is an indexed vector referring to the n-th candidate point of $GN_i$, whose concrete spatial coordinates $(d,h)$ are stored in and retrieved directly from the state dataset.
+    According to their functional roles within a stage transition, the candidate states of $GN_i$ fall into two categories:
+    \begin{itemize}
+        \item The \textbf{entry states}, denoted as $S^{in}_{i,j}\in GN_i^{in}$, which are sampled on the coverage boundary of $GN_i$ and at which the UAV enters the communication region and begins data collection;
+        \item The \textbf{exit states}, denoted as $S_{i,n}$, at which the data collection for $GN_i$ terminates and from which the transition toward $GN_{i+1}$ departs; the optimal reached energy $F_{i,n}$ is attached to each exit state.
+    \end{itemize}
+
+    An exit state of $GN_{i-1}$ that lies within the coverage of $GN_i$ simultaneously serves as an entry state of $GN_i$.
+    The initial deployment position is treated as the unique exit state $S_{0,1}$ of stage 0.
+\end{definition}
+
+
+
+\begin{definition}[ORE sub-problem]\label{def:ORE}
+    Let $S$ be any candidate state in \textit{Definition. \ref{def:state}}, either an exit state $S_{i,m}$ or an entry state $S^{in}_{i,j}$.
+    The \textit{optimal reached energy} (ORE) of $S$, denoted $F(S)$, is the minimum cumulative flight energy of any feasible trajectory that departs from the initial state $S_{0,1}$, sequentially completes the data collection of $GN_1, \dots, GN_{i-1}$ (and, if $S$ is an exit state $S_{i,m}$, also of $GN_i$), and arrives precisely at $S$.
+
+    The ORE value specializes to the two progress points within each stage: for an exit state, $F_{i,m} \triangleq F(S_{i,m})$ is the minimum energy upon \textit{completing} the collection of $GN_i$ at $S_{i,m}$; for an entry state, $F^{in}_{i,j} \triangleq F(S^{in}_{i,j})$ is the minimum energy upon \textit{reaching} the coverage boundary of $GN_i$ at $S^{in}_{i,j}$, immediately before its collection starts.
+    An ORE sub-problem is the computation of $F(S)$ for a specific state $S$; solving it for all candidate states at stage $i$ yields the building blocks of the dynamic programming recurrence.
+\end{definition}
+
+Although the global challenge is successfully structured into localized sub-problems defined by $F_{i,n}$, computing the optimal value requires establishing a recurrence relation that links the current stage to the preceding ones.
+To ensure the mathematical validity of this dynamic programming formulation, we must first rigorously verify that the state transitions possess the Markov property (non-aftereffect), which is guaranteed by both physical and temporal independence in our system.
+
+We first make explicit the three system properties on which the dynamic programming formulation rests.
+
+\begin{enumerate}[\textbf{A\arabic*.}]
+    \item \textit{Memoryless power model.}
+    The instantaneous power $P(v_{\parallel}, v_{\perp})$ in Eq.~(\ref{equ:e_1}) is an algebraic function of the current velocity components only; it carries no dependence on the UAV's acceleration, inertia, or velocity history.  
+    \item \textit{No global mission deadline.}
+    The formulation imposes no upper bound on the total mission time $T$; the elapsed flight time therefore consumes no temporal budget of any subsequent flight.
+    \item \textit{Stage-local duration constraints.}
+    Each minimum collection duration $\tau_i$ is an intrinsic parameter of its own ground node $GN_i$ and is enforced only while the UAV resides inside the communication region of $GN_i$; it neither varies with the arrival instant at any state nor constrains the duration of any flight segment outside that region.
+\end{enumerate}
+
+\begin{theorem}[non-aftereffect]
+    \label{thm:aftereffect}
+    Let $S$ be an arbitrary state reached by the UAV during the mission, and let $\mathcal{P}_{out}(S)$ be the set of feasible outbound paths departing from $S$.
+    Under Assumptions A1-A3, both the feasible set $\mathcal{P}_{out}(S)$ and the energy of every path in it are independent of the inbound path by which $S$ was reached.
+    Consequently, the optimal outbound sub-path
+    \[
+    \mathcal{P}^{*}_{out}(S) = \arg\min_{\mathcal{P} \in \mathcal{P}_{out}(S)} E(\mathcal{P})
+    \]
+    depends only on the coordinates encoded in $S$ and on the parameters of the subsequent ground nodes.
+    The state $S$ is therefore a sufficient statistic of the entire flight history for all future decisions: the multi-stage state transitions of the \textit{JHVSO} problem satisfy the Markov non-aftereffect property.
+
+\end{theorem}
+
+\begin{proof}
+    The proof proceeds in two steps, corresponding to the two objects whose invariance must be established.
+
+    \textit{Step 1: The feasible set $\mathcal{P}_{out}(S)$ is invariant.}
+    An outbound path departing from $S$ is constrained by (i) the communication regions of the subsequent ground nodes, which are fixed geometric objects in the $(d,h)$ plane determined by Eq.~(\ref{equ:PL}) and Eq.~(\ref{equ:M}); (ii) the speed limits of \textit{Definition. \ref{def:JHVSO}}; and (iii) the collection durations $\tau_j$ of the subsequent ground nodes.
+    By A3, each $\tau_j$ is enforced only while the UAV resides inside the communication region of its own node, and imposes no constraint on the duration of any other segment; by A2, no global deadline couples the time already spent along the inbound path into the feasibility of the outbound path.
+    Hence $\mathcal{P}_{out}(S)$ is fully determined by the coordinates of $S$ and by the parameters of the subsequent ground nodes, and does not vary with the inbound path.
+
+    \textit{Step 2: The energy of every outbound path is invariant.}
+    By A1, the power at any instant is a memoryless function of the  instantaneous velocity.
+    The energy of any outbound path $\mathcal{P} \in \mathcal{P}_{out}(S)$ is therefore $E(\mathcal{P}) = \int_{\mathcal{P}} P(v_{\parallel}(t), v_{\perp}(t))\,dt$, which depends on $\mathcal{P}$ alone and not on the inbound path.
+
+    Combining the two steps, both the feasible set and the objective function of the outbound sub-problem are independent of the inbound path, so its minimizer $\mathcal{P}^{*}_{out}(S)$ is likewise independent.
+    The accumulated inbound energy $E(\mathcal{P}_{in})$ enters the global objective only as an additive constant (see Corollary. \ref{cor:en_add}); it shifts the total cost but does not alter the outbound minimizer.
+    This completes the proof.\qed
+\end{proof}
+
+\begin{corollary}[Energy additivity]\label{cor:en_add}
+    For any state $S$ reached by the UAV and any pair of inbound and outbound paths concatenated at $S$, the mission energy decomposes additively over the concatenation:
+    \[ E(\mathcal{P}_{in}(S)\oplus \mathcal{P}_{out}(S))  = E(\mathcal{P}_{in}(S)) + E(\mathcal{P}_{out}(S)) \]
+\end{corollary}
+
+\begin{proof}
+    Immediate from A1: the energy is the time integral of a memoryless power mapping, and the integral splits at the junction instant.\qed
+\end{proof}
+
+\textit{Theorem. \ref{thm:aftereffect}} ensures that, once the current state is fixed, the optimal future trajectory is independent of the past.
+\textit{Corollary. \ref{cor:en_add}} then allows the total mission energy to be decomposed additively at every intermediate state Specializing \textit{Definition.\ref{def:ORE}} to the exit states, the non-aftereffect property yields the stage-wise recurrence
+
+\begin{equation}
+    F_{i,n} = \min_{\forall S_{i-1,m}\in GN_{i-1}}(F_{i-1,m}+C(S_{i-1,m},S_{i,n}))
+    \label{equ:ore_1}
+\end{equation}
+where $C(S_{i-1,n}, S_{i,m})$ is the local transition cost defined above.
+To evaluate $C(S_{i-1,m},S_{i,n})$ precisely, we must analyze the structural complexity within the transition interval itself.
+Due to the spatial distribution of the network, when the UAV terminates the data collection task for $GN_{i-1}$ at state $S_{i-1,m}$, it does not necessarily reside within the wireless transmission coverage of the subsequent node $GN_i$, i.e. $S_{i-1,m} \notin GN_i$.
+To decouple this spatial complexity, we employ the spatial boundary of $GN_i$ as a dividing landmark and split the entire transition into two distinct phases: the Gap segment, the cruising phase in which the UAV flies from the previous exit state $S_{i-1,m}$ to a specific entry point $S^{in}_{i,j}$ on the boundary of $GN_i$, and the Task segment, the execution phase in which the UAV remains inside the transmission range of $GN_i$ to perform data collection before terminating at $S_{i,n}$.
+The additive decomposition of the transition cost over these two phases is once again licensed by \textit{Theorem. \ref{thm:aftereffect}}, now applied at the intra-transition level with the entry point $S^{in}_{i,j}$  acting as the intermediate state.
+The temporal-independence premise is preserved: the flying duration of the Gap segment is dynamically determined by the spatial distance and the selected transit velocity, yet it is completely decoupled from and has zero influence on the subsequent Task segment; the minimum collection duration $\tau_i$ reqiured by $GN_i$ is exclusively consumed within the Task segment, ensuring that the temporal resource allocated for data upload is never encroached upon or compromised by the preceding Gap cruising flight.
+The two segments can therefore be optimized independently, and the local transition cost decomposes as
+\begin{equation}
+     C(S_{i-1,m},S_{i,n}) = \min_{\forall S^{in}_{i,j}}(C_{gap}(S_{i-1,m},S^{in}_{i,j})+C_{task}(S^{in}_{i,j},S_{i,n})) 
+     \label{equ:local_transition}
+\end{equation}
+where $C_{gap}$ and $C_{task}$ denote the minimum flight energies of the Gap and Task segments, respectively
+
+By synthesis of the non-aftereffect property, the structural division of Gap/Task segments, and \textit{Theorems. \ref{thm:constant-speed} and \ref{thm:optimal-range-speed}}, the search space within each sub-problem is comprehensively bounded and simplified.
+\textit{Theorems. \ref{thm:constant-speed} and \ref{thm:optimal-range-speed}} further reduce the continuous functional optimization of the transition profiles into low-dimensional scalar velocity selections for both segments: within the Task segment, where the collection duration imposes a tight temporal constraint, \textit{Theorem. \ref{thm:constant-speed}} dictates constant-velocity straight-line flight; within the unconstrained Gap segment, \textit{Theorem. \ref{thm:optimal-range-speed}} dictates the pitch-angle-dependent energy-optimal speed.
+Consequently, the continuous \textit{JHVSO} problem is thoroughly transformed into a discrete shortest-path graph search that can be solved with deterministic mathematical optimality.
+
+
+% Crucially, the temporal non-aftereffect of these two segments is strictly preserved. While the flying duration of the Gap segment dynamically depends on the spatial distance and the selected transit velocity, it is completely decoupled from and has zero influence on the subsequent Task segment. The minimum collection duration $\tau_i$ required by $GN_i$ is exclusively consumed within the Task segment, ensuring that the temporal resource allocated for data upload is never encroached upon or compromised by the preceding Gap cruising flight.  
+
+% This non-aftereffect allows us to optimize the two flight segments independently, so that we can get the optimal transition cost between any two states in the end.
+
+% By synthesis of the non-aftereffect property, the structural division of Gap/Task segments, and Theorems~\ref{thm:constant-speed} and~\ref{thm:optimal-range-speed}, the search space within each sub-problem is comprehensively bounded and simplified. Theorems~\ref{thm:constant-speed} and~\ref{thm:optimal-range-speed} reduce the continuous function optimization of transition profiles into low-dimensional scalar velocity selections for both segments. Consequently, the continuous JSAS problem is thoroughly transformed into an discrete shortest-path graph search that can be solved with deterministic mathematical optimality.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 

@@ -1,0 +1,152 @@
+%% 
+%% Copyright 2019-2024 Elsevier Ltd
+%% 
+%% This file is part of the 'CAS Bundle'.
+%% --------------------------------------
+%% 
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.3c of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTe
+%% version 1999/12/01 or later.
+%% 
+%% The list of all files belonging to the 'CAS Bundle' is
+%% given in the file `manifest.txt'.
+%% 
+%% Template article for cas-dc documentclass for 
+%% double column output.
+
+\documentclass[a4paper,fleqn]{cas-dc}
+
+% If the frontmatter runs over more than one page
+% use the longmktitle option.
+
+%\documentclass[a4paper,fleqn,longmktitle]{cas-dc}
+
+\usepackage[numbers, compress]{natbib}
+%\usepackage[authoryear]{natbib}
+%\usepackage[authoryear,longnamesfirst]{natbib}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%%%Author macros
+\newcommand{\etal}{\emph{et~al.}}
+\def\tsc#1{\csdef{#1}{\textsc{\lowercase{#1}}\xspace}}
+\tsc{WGM}
+\tsc{QE}
+%%%
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newproof{proof}{Proof}
+\newdefinition{definition}{Definition}
+\newtheorem{corollary}{Corollary}
+\newtheorem{remark}{Remark}
+
+\begin{document}
+\let\WriteBookmarks\relax
+\def\floatpagepagefraction{1}
+\def\textpagefraction{.001}
+
+% Main title of the paper
+\title[mode=title]{Joint Horizontal-Vertical Speed Optimization for Energy-Efficient UAV Data Collection}
+% Alternative title candidates:
+% Energy-Optimal UAV Data Collection via Joint Speed and Altitude Scheduling
+% A 3D Distance--Time--Height Framework for Energy-Efficient UAV Data Collection
+% Optimal Joint Speed and Altitude Scheduling for Energy-Efficient UAV Data Collection
+% joint horizontal-vertical speed optimization (JHVSO) algorithm
+
+% Short title
+\shorttitle{}    
+
+% First author
+%
+% Options: Use if required
+% eg: \author[1,3]{Author Name}[type=editor,
+%       style=chinese,
+%       auid=000,
+%       bioid=1,
+%       prefix=Sir,
+%       orcid=0000-0000-0000-0000,
+%       facebook=<facebook id>,
+%       twitter=<twitter id>,
+%       linkedin=<linkedin id>,
+%       gplus=<gplus id>]
+\author[2]{Haozhe~Zhang}
+\ead{421785689a@gmail.com}
+\author[1, 2]{Feng~Shan}[orcid=0000-0001-7398-8265] \cormark[1]
+\ead{shanfeng@seu.edu.cn}
+\author[1, 2]{Ming~Yang}
+\ead{yangming2002@seu.edu.cn}
+
+\address[1]{School of Computer Science and Engineering, Southeast University, Nanjing 211189, Jiangsu, P. R. China}
+\address[2]{Jiangsu Key Laboratory of Network and Information Security, Southeast University, Nanjing 211189, Jiangsu, P. R. China}
+
+% Short author
+\shortauthors{}  
+
+% Corresponding author text
+\cortext[1]{Corresponding author}
+
+% For a title note without a number/mark
+%\nonumnote{}
+
+% Here goes the abstract
+\begin{abstract}
+Unmanned aerial vehicles (UAVs) have emerged as an efficient platform for periodically collecting massive amounts of data from distributed ground nodes (GNs) deployed for environmental and infrastructure monitoring.
+Given the limited onboard energy of UAVs, energy-efficient trajectory optimization is critical, yet existing studies often restrict vertical movement or treat height adjustments independently as discrete transitions between horizontal segments.
+To capture realistic three-dimensional motion, we adopt a practical 3D flight energy consumption model that accounts for the continuous coupling between horizontal and vertical propulsion power through joint horizontal--vertical speed optimization.
+Moreover, because the ground-to-air communication range varies with flight height, the horizontal and vertical speeds must be jointly optimized to balance communication coverage and flight energy consumption.
+Accordingly, we formulate a joint horizontal--vertical speed optimization (JHVSO) problem that simultaneously considers horizontal and vertical motions, height-dependent communication ranges, and the required data collection time of each GN.
+We establish key optimality properties by proving that constant-velocity straight-line flight minimizes the energy between two states for a given duration and deriving the pitch-angle-dependent speed that minimizes energy consumption per unit distance during unconstrained flight.
+Based on these properties, we develop an Optimal Reached Energy (ORE) dynamic programming algorithm that decomposes the trajectory into gap and task segments, recursively evaluates feasible communication-boundary transition states, and guarantees global optimality over the discretized state space through the non-aftereffect property between successive stages.
+Extensive simulations across 34 experimental configurations show that ORE consistently consumes less energy than ASSUME, MSMO, ACO, and a greedy speed--height baseline, reducing energy consumption by up to 14.8\% compared with the greedy speed--height baseline and by up to 5.1\% over the strongest competing baseline, while a case study involving 10 real-world traffic-camera locations further demonstrates its practical applicability.
+\end{abstract}
+%TODO 摘要中的数据4%太小了，实验部分6.2需要通篇修改，每一个字体都要增加量化的性能提升，并选择亮眼的数字，放到摘要中，替换4%。
+%TODO 图片或者表格的caption全部检查一遍，要包括主要核心内容：读者如果仅仅读图和图标题，也能大致了解咱们的方法和技术
+
+% Keywords
+\begin{keywords}
+Unmanned aerial vehicle \sep Data collection \sep Trajectory optimization \sep Joint speed and altitude scheduling \sep Dynamic programming \sep Energy efficiency
+\end{keywords}
+
+\maketitle
+
+%标题
+%
+% Main text
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{sections/01-introduction}
+\input{sections/02-related-works}
+\input{sections/03-system-model}
+\input{sections/04-problem-analysis}
+\input{sections/05-algorithm}
+\input{sections/06-simulation}
+\input{sections/07-conclusion}
+\input{sections/08-appendix}
+
+% To print the credit authorship contribution details
+\printcredits
+
+%% Loading bibliography style file
+\bibliographystyle{ieeetr}
+
+% Loading bibliography database
+\bibliography{references}
+
+% Biography
+%\bio{}
+% Here goes the biography details.
+%\endbio
+
+%\bio{pic1}
+% Here goes the biography details.
+%\endbio
+
+\end{document}

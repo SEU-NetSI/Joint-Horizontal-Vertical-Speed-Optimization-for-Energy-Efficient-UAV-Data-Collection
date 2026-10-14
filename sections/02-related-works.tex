@@ -1,0 +1,52 @@
+
+\section{Related Works}
+\label{sec:relatedworks}
+This section reviews speed scheduling for UAV data collection and the flight energy consumption models adopted in this work.
+
+\subsection{Speed Scheduling at a Fixed Altitude}
+
+UAV-aided data-collection from ground nodes (GNs) has been extensively studied, though largely with optimization targets other than flight energy.
+Gong \etal~\cite{Flight-Time-Minimization} minimize the mission completion time; Gao \etal~\cite{AoI-Sensitive-Data-Collection} and Wang \etal~\cite{Cooperative-Data-Collection} minimize the age of information of the collected data; Chang \etal~\cite{Data-collection-and-offloading} plan the discrete visiting order of GNs jointly with battery-swapping decisions; and Ning \etal~\cite{Wireless-powered-IOT} integrate data acquisition with wireless power transfer.
+In these designs, the flight speed is fixed as a constant or treated merely as a feasibility constraint, leaving the energy-saving potential of speed scheduling unexploited.
+The idea of trading service rate for energy under deadline constraints dates back to the energy-efficient transmission scheduling of Zafer and Modiano~\cite{A-calculus-Approach}, where the convexity of the power-rate function implies constant-rate optimality on cumulative data-time diagrams.
+UAV speed scheduling exploits the same mathematical structure via the convexity of the propulsion power-speed function.
+For UAV data collection, Xiong and Shan~\cite{DroneTank} jointly planned the UAV flight and the sensors' data transmission under energy constraints in DroneTank, and Shan \etal~\cite{lbc} derived the energy-optimal speed profile as a shortest path on a distance-time diagram with the looking-before-crossing (LbC) algorithm.
+Ye \etal~\cite{offspeeding} further established a provably optimal offline speed scheduler, Offspeeding, for UAV-assisted edge computing with per-task deadlines, by exploiting the convexity of a practical flight energy consumption model; the idea was later generalized to arbitrary point-of-interest visiting topologies by Shan \etal~\cite{Energy-Efficient-POI} and recently coupled with battery swapping in UAV-enabled mobile edge computing by Ye \etal~\cite{Optimal-Flight-Speed-Scheduling-and-Battery-Swapping}.
+Nevertheless, these works confine the UAV to a fixed altitude and adopt energy consumption models accounting for horizontal motion only, ignoring the vertical dimension and the altitude-dependent quality of ground-to-air channels.
+
+\subsection{Speed Scheduling with a Variable Altitude}
+
+When the flight altitude enters the decision space, its coupling with speed substantially complicates the scheduling problem.
+Early studies, e.g., Mozaffari \etal~\cite{Mobile-UAVs-for-IoT}, optimized the UAV position or altitude for communication coverage and energy efficiency, yet without scheduling the flight speed.
+Closer to our problem, Huang \etal~\cite{assume} jointly schedule altitude and speed for energy-minimal data collection in ASSUME, where vertical movement is modeled as discrete transitions between horizontal flight segments; Wang \etal~\cite{joint} further address unknown visiting orders through ant-colony optimization in JUSAS, at the cost of high computational overhead and without global optimality guarantees.
+Towards continuous three-dimensional motion, Sun \etal~\cite{Matrix-Based-Evolutionary-Computation} parameterized the UAV trajectory with Bézier curves and optimized the control points via matrix-based differential evolution over 3D terrain; Ding \etal~\cite{3D-Trajectory-and-Frequency-Band} formulated joint 3D trajectory design, node association, and resource allocation as a (constrained) Markov decision process solved by deep reinforcement learning; and Hoang \etal~\cite{Adaptive-3D-Placement} studied adaptive 3D placement of UAV-mounted base stations in the same spirit.
+These works free the vertical dimension, but they either superpose the horizontal and vertical propulsion power in an additive, decoupled manner, or rely on heuristic and learning-based solvers that admit no global optimality guarantee.
+
+\subsection{Flight Energy Consumption Models of Multi-Rotor UAVs}
+
+The credibility of energy-oriented scheduling rests on the underlying flight energy consumption model, which falls into three categories.
+Distance-related models account energy by the traveled distance and the number of turns, as in Piao \etal~\cite{Automating} and Modares \etal~\cite{UB-ANC-planner}, whereas duration-related models multiply a constant power by the flight time, as in Ko and Gau~\cite{UAV-Velocity-Function-Design}.
+Speed-related models instead capture the fact that the propulsion power is a convex function of the flight speed.
+Zeng \etal~\cite{Rotary-Wing-UAV} derived the now-standard analytical model for rotary-wing UAVs, decomposing the power into blade-profile, induced, and parasite components, and Morbidi \etal~\cite{Minimum-energy-path-generation} reached a consistent model from the electrical dynamics of brushless DC motors.
+Building on this line, Gong \etal~\cite{GongHao} extended the flight energy consumption model to 3D flight by summing the hovering power with independent increments induced by the horizontal and vertical velocity components, and Liu \etal~\cite{PowerConsumptionModel} further characterized the vertical flight power from actuator-disk theory.
+Such speed-related models have been widely adopted in recent UAV-assisted edge computing and trajectory designs~\cite{Safe-and-Energy-Efficient-Trajectory, Energy-Efficient-UAV-Assisted-MEC}).
+However, existing 3D extensions treat the horizontal and vertical power as independent additive terms, whereas in practice the two are coupled through the rotor thrust and the induced airflow—a coupling that our flight energy consumption model accounts for explicitly.
+
+\subsection{Communication Models}
+
+The communication range of a GN served by a UAV is inherently altitude-dependent.
+Al-Hourani \etal~\cite{CommunicationModel} derived the optimal altitude of a low-altitude platform that maximizes the coverage radius under a probabilistic line-of-sight (LoS) model, which has become the foundation of altitude-dependent coverage analyses, including the ground-to-air channel model adopted in this work.
+In UAV-enabled sensor data collection, the wake-up and communication radius is commonly determined by a signal-to-noise ratio threshold over the ground-to-air link, as in Zhan \etal~\cite{Energy-efficient-data-collection}, and can be further shaped by jointly optimizing the altitude and the antenna beamwidth, as shown by Choi and Lee~\cite{Altitude-and-beamwidth}.
+Recent field measurements have revealed additional fine-grained effects: Zhang \etal~\cite{Directivity-Aware-Link-Model} showed that the altitude-induced misalignment of antenna radiation patterns degrades ground-to-air LoRa links, and proposed a directivity-aware annulus link model; Huang \etal~\cite{AIM} incorporated the angle of radiation into relay deployment for 3D connectivity; and Li \etal~\cite{Poisson-Delaunay} characterized the LoS/NLoS probability and coverage statistics of air-ground networks via stochastic-geometry analyses.
+This altitude dependence couples the communication opportunity with the vertical motion of the UAV, and hence with its speed scheduling—exactly the coupling exploited in this work.
+
+In summary, while existing research has made significant strides in UAV trajectory planning and energy-efficient speed control, critical gaps remain.
+Most current literature either relies on overly simplified flight energy consumption models that neglect the coupled effects of altitude and flight dynamics, or employs heuristic-based algorithms that fail to guarantee global optimality in complex scenarios.
+Furthermore, few studies have adequately addressed the joint scheduling of flight speed and altitude as a unified sequential decision process.
+To address these deficiencies, this paper moves beyond static or decoupled optimization frameworks.
+We propose a rigorous \textit{JHVSO} (Joint Horizontal-Vertical Speed Optimization) model that integrates sophisticated aerodynamic power consumption characteristics.
+By leveraging the theoretical properties of the power function and the non-aftereffect nature of multi-stage transitions, we formulate a dynamic programming approach that systematically identifies the global energy-optimal trajectory, providing a more robust and efficient solution for UAV data collection missions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
