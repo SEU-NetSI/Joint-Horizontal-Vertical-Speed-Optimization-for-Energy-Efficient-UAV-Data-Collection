@@ -19,12 +19,12 @@ The connection between UAV and the GN would loss, when the path loss exceeds $PL
 \begin{multline}
     PL_i(r_i,h_i)
     =\frac{\mu_{LoS}-\mu_{NLoS}}
-    {1+\alpha \exp(-b[\arctan(\frac{h_{i}}{r_{i}})-\alpha])} \\
+    {1+a \exp(-b[\frac{180}{\pi}\arctan(\frac{h_{i}}{r_{i}})-a])} \\
     +10 \log(h_{i}^2+r_{i}^2)+M
     \label{equ:PL}
 \end{multline}
 
-Eq.~(\ref{equ:PL}) gives the expected path loss under the probabilistic line-of-sight (LoS) model~\cite{CommunicationModel}, where $\mu_{LoS}$ and $\mu_{NLoS}$ are the mean excess losses of LoS and non-LoS links, and $\alpha$ and $b$ are environment-dependent parameters.
+Eq.~(\ref{equ:PL}) gives the expected path loss under the probabilistic line-of-sight (LoS) model~\cite{CommunicationModel}, where $\mu_{LoS}$ and $\mu_{NLoS}$ are the mean excess losses of LoS and non-LoS links, and $a$ and $b$ are environment-dependent parameters.
 The constant $M$ collects the carrier-frequency and free-space propagation factors together with the NLoS excess loss:
 \begin{equation}
     M=20\log f+20\log\left(\frac{4\pi}{c}\right)+\mu_{NLoS},
@@ -32,16 +32,22 @@ The constant $M$ collects the carrier-frequency and free-space propagation facto
 \end{equation}
 where $f$ is the carrier frequency and $c$ is the speed of light.
 
-The key angular variable is the link elevation angle $\theta_i=\arctan(h_i/r_i)$, measured between the GN--UAV line and the horizontal plane.
-It determines the LoS probability $P_{LoS}(\theta_i)=1/(1+\alpha\exp(-b[\theta_i-\alpha]))$: a larger $\theta_i$ increases the LoS probability and thus reduces the expected excess loss when $\mu_{LoS}<\mu_{NLoS}$.
+The key angular variable is the link elevation angle $\theta_i=\frac{180}{\pi}\arctan(h_i/r_i)$ (in degrees), measured between the GN--UAV line and the horizontal plane.
+It determines the LoS probability $P_{LoS}(\theta_i)=1/(1+a\exp(-b[\theta_i-a]))$: a larger $\theta_i$ increases the LoS probability and thus reduces the expected excess loss when $\mu_{LoS}<\mu_{NLoS}$.
 However, at a fixed horizontal distance, increasing altitude also lengthens the slant range $d_i=\sqrt{h_i^2+r_i^2}$ and increases the free-space loss.
 These competing effects determine the altitude-dependent communication region defined by $PL_i(r_i,h_i)\leq PL_i^{max}$, as illustrated in Fig.~(\ref{fig:communication_range}).
+
+To model the data upload, we characterize each $GN_i$ by a nominal SINR $\gamma_i$, which is a per-node design parameter given in advance---like the path-loss threshold $PL_i^{max}$---rather than the instantaneous, position-dependent SINR experienced by the UAV. Letting $B$ denote the channel bandwidth, the achievable rate of the link is evaluated at this nominal SINR through the Shannon capacity:
+\begin{equation}
+    \bar{R}_i = B\log_2(1+\gamma_i). \label{equ:const_rate}
+\end{equation}
+Each $GN_i$ therefore uploads data at the constant rate $\bar{R}_i$ throughout the collection phase, which yields the deterministic collection duration $\tau_i = D_i/\bar{R}_i$.
 
 \begin{figure}[]
   \centering
    \includegraphics[width = 1\linewidth]{figures/gn-communication-range-3d.png}
     \caption{Altitude-dependent communication regions defined by Eq.~(\ref{equ:PL}) and Eq.~(\ref{equ:M}).
-    The UAV must remain within the region of $GN_i$ for the required data collection duration $\tau_i$.}\label{fig:communication_range}
+    The UAV must remain within the region of $GN_i$ for the required data collection duration $\tau_i = D_i/\bar{R}_i$, where $D_i$ is the data volume of $GN_i$ and $\bar{R}_i = B\log_2(1+\gamma_i)$ is the constant achievable rate.}\label{fig:communication_range}
 \end{figure}
 
 The link elevation angle differs from the UAV's flight-path angle, which describes the direction of its velocity.
@@ -61,6 +67,11 @@ Following~\cite{GongHao}, we express the total power as the hovering power plus 
     The vertical power in Eq.~(\ref{equ:v_1}) increases monotonically with the climb rate.
     Both functions yield the same hovering power, $P_{mh} = 390.95\,\mathrm{W}$, at zero speed.}
 \end{figure}
+
+Let $V_{total}$ denote the total (resultant) flight speed and $\gamma$ the flight pitch angle, defined as the angle between the velocity vector and the horizontal plane. The horizontal and vertical velocity components are related to $V_{total}$ and $\gamma$ by
+\[
+    V_{\parallel} = V_{total}\cos\gamma, \qquad V_{\perp} = V_{total}\sin\gamma.
+\]
 
 \begin{equation}
     P_{total}(V_{total}) = P_{mh} + \Delta P_{\parallel}(V_{\parallel}) + \Delta P_{\perp}(V_{\perp}),
@@ -148,8 +159,10 @@ The total flight energy follows directly from the decoupled flight energy consum
 where $T$ is the total mission time.
 
 \begin{definition}[JHVSO problem]\label{def:JHVSO}
-    Given ordered ground nodes $GN_1,\ldots,GN_N$, their communication regions, and required collection durations $\tau_i$, the \textit{JHVSO} problem seeks a trajectory $q(t)=(d(t),h(t))$ and collection intervals that minimize the total flight energy in Eq.~(\ref{equ:Etotoal}).
-    The UAV must serve the nodes in order, collecting from one node at a time for at least $\tau_i$ within its communication region, and fly from the prescribed initial position at altitude $h_0$ to a point within the last node's communication region and an altitude of $h_f$.
+    Given ordered ground nodes $GN_1,\ldots,GN_N$, their communication regions, and the data volume $D_i$ of each $GN_i$, the \textit{JHVSO} problem seeks a trajectory $q(t)=(d(t),h(t))$ and collection intervals that minimize the total flight energy in Eq.~(\ref{equ:Etotoal}).
+    Under the constant achievable rate $\bar{R}_i$ in Eq.~(\ref{equ:const_rate}), collecting the data volume $D_i$ requires a duration $\tau_i = D_i/\bar{R}_i$; the collection of $GN_i$ is successful if and only if the UAV stays within its communication region for a total duration of at least $\tau_i$.
+    The UAV must serve the nodes in order, collecting from one node at a time, and fly from the prescribed initial position at altitude $h_0$ to a point within the last node's communication region and an altitude of $h_f$.
+    The flight altitude is additionally bounded by $h_{\min} \le h(t) \le h_{\max}$, where $h_{\min}$ and $h_{\max}$ are the lower and upper altitude limits.
 \end{definition}
 
 The starting altitude $h_{0}$ and final altitude $h_f$ are exogenous mission parameters specified per scenario.

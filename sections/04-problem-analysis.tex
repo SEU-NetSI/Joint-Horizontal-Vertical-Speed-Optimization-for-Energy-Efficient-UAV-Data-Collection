@@ -124,6 +124,11 @@ See Appendix~\ref{pro:Theorem optimal-range-speed}.
 \qed
 \end{proof}
 
+\begin{remark}[Piecewise constant-speed trajectories and dynamic feasibility]
+\label{rem:acc-dec}
+    The resulting trajectory is piecewise constant-speed, with task segments flown per Remark~\ref{rem:task-speed} and gap segments per Theorem~\ref{thm:optimal-range-speed}, so consecutive segments may change velocity at their shared boundary. In practice, this change is realized by a brief acceleration/deceleration phase whose time and energy are only a small fraction of the total mission~\cite{msmo}; the constant speeds are therefore target cruise speeds tracked with short transition ramps, and full acceleration dynamics are left as future work.
+\end{remark}
+
 
 
 
@@ -152,6 +157,8 @@ Under this staged decomposition, we transform the global continuous trajectory o
     An exit state of $GN_{i-1}$ that lies within the coverage of $GN_i$ simultaneously serves as an entry state of $GN_i$.
     The initial deployment position is treated as the unique exit state $S_{0,1}$ of stage 0.
 \end{definition}
+
+Candidate state points whose altitude violates $ h_{\min}\le h \le h_{\max}$ are simply discarded during state-space construction, so the dynamic program only ever considers altitude-feasible states; no other change to the algorithm is required.
 
 
 
@@ -206,6 +213,11 @@ We first make explicit the three system properties on which the dynamic programm
     The accumulated inbound energy $E(\mathcal{P}_{in})$ enters the global objective only as an additive constant (see Corollary. \ref{cor:en_add}); it shifts the total cost but does not alter the outbound minimizer.
     This completes the proof.\qed
 \end{proof}
+
+\begin{remark}[Role of the no-deadline assumption]
+\label{rem:deadline}
+    Assumption A2 is essential to Theorem~\ref{thm:aftereffect}: with a global deadline $T \le T_{\max}$, the feasibility of an outbound path would depend on the elapsed time, so each DP state would need to be augmented with a time dimension, and the overall algorithm would have to be revisited accordingly. The no-deadline assumption is therefore deliberate, as it keeps the state space low-dimensional and enables the efficient stage-wise recurrence; extending the framework to deadline-constrained missions is left as future work.
+\end{remark}
 
 \begin{corollary}[Energy additivity]\label{cor:en_add}
     For any state $S$ reached by the UAV and any pair of inbound and outbound paths concatenated at $S$, the mission energy decomposes additively over the concatenation:

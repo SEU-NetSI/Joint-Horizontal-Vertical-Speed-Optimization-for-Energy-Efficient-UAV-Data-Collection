@@ -98,7 +98,7 @@
 \begin{abstract}
 Unmanned aerial vehicles (UAVs) have emerged as an efficient platform for periodically collecting massive amounts of data from distributed ground nodes (GNs) deployed for environmental and infrastructure monitoring.
 Given the limited onboard energy of UAVs, energy-efficient trajectory optimization is critical, yet existing studies often restrict vertical movement or treat height adjustments independently as discrete transitions between horizontal segments.
-To capture realistic three-dimensional motion, we adopt a practical 3D flight energy consumption model that accounts for the continuous coupling between horizontal and vertical propulsion power through joint horizontal--vertical speed optimization.
+To capture realistic three-dimensional motion, we adopt a practical 3D flight energy consumption model and jointly optimize the horizontal and vertical speeds.
 Moreover, because the ground-to-air communication range varies with flight height, the horizontal and vertical speeds must be jointly optimized to balance communication coverage and flight energy consumption.
 Accordingly, we formulate a joint horizontal--vertical speed optimization (JHVSO) problem that simultaneously considers horizontal and vertical motions, height-dependent communication ranges, and the required data collection time of each GN.
 We establish key optimality properties by proving that constant-velocity straight-line flight minimizes the energy between two states for a given duration and deriving the pitch-angle-dependent speed that minimizes energy consumption per unit distance during unconstrained flight.

@@ -10,6 +10,7 @@
 
 In this section, we present the algorithmic framework designed to address the joint speed optimize problem.
 Specifically, we delineate the calculation of the local transition cost between consecutive state points, formulate the recursive solution for the Optimal Reached Energy (ORE) sub-problem, and establish the theoretical optimality of the global scheduling algorithm.
+The candidate state sets $GN_i$ are pre-filtered by the altitude bounds $h_{\min}\le h\le h_{\max}$ during state-space construction, so the dynamic program operates on altitude-feasible states only.
 
 \subsection{Calculation for Local Transition Cost}
 

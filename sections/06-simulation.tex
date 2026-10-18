@@ -23,10 +23,12 @@ In each controlled experiment, only the default value of the scanned parameter i
  Parameter & Default & Variation Range \\ % Table header row
 \midrule
  Average\ $PL\ (dB)$ & 85  & [83 86]\\
- Average\ $\tau\ (s)$ & 22 & [18 25]\\
+ Average\ $D_i\ (Mbit)$ & 88 & [72 100]\\
+ Nominal\ SINR\ $\gamma_i$ & 15 & [12 18]\\
  Parameter\ $\mu _{LoS}\ (dB)$& 1.3 & [1 1.6]\\
  Parameter\ $\mu _{NLoS}\ (dB)$& 35 & -\\
  Average distance\ $(m)$& 60 & [30 80]\\
+ Altitude\ bounds\ $[h_{\min},h_{\max}]$ (m) & [50, 150] & -\\
  Parameter\ $a$& 45 & [42 47]\\
  Parameter\ $b$& 0.25 & [0.2 0.3]\\
  Average\ number\ of\ $GN$& 20 & -\\
@@ -40,10 +42,12 @@ The probability of establishing an LoS link depends heavily on the elevation ang
 The wireless communication operates at a standard carrier frequency of $f = 2.4 GHz$, with the speed of light defined as $c = 3 \times 10^8$ m/s.
 The average excessive path losses for LoS and Non-Line-of-Sight (NLoS) connections are configured as $\mu_{LoS} = 1.3$ dB and $\mu_{NLoS} = 35$ dB, respectively.
 A communication link is deemed valid and available for data upload if and only if the total path loss remains below a maximum allowable threshold of $PL = 85$ dB, which defines the continuous geometric coverage boundary shape for each GN.
+The data upload adopts a channel bandwidth of $B = 1$ MHz and a per-GN nominal SINR $\gamma_i$ sampled from $[12, 18]$ (default $15$), which yields a constant achievable rate $\bar{R}_i = B\log_2(1+\gamma_i)$, about $4$ Mbps at the default. The required collection duration is then $\tau_i = D_i/\bar{R}_i$, which is approximately $22$ s on average under the default data volume $D_i = 88$ Mbit.
 
 Each experimental configuration is repeated over $K = 5$ independent trials.
 In every trial, the GN positions and the per-GN parameters are re-sampled uniformly from the variation ranges listed in \textit{Table.\ref{tbl:parameters}}, and the reported energy is the average over the $K$ trials.
-The starting altitude is an exogenous mission constraint: the UAV departs and terminates at an altitude of $50$ m in the simulations of Sections~6.1--6.2, and at $100$ m in the real-world case study of Section~6.3.
+The starting altitude is an exogenous mission constraint: the UAV departs and terminates at an altitude of $50$ m in the simulations of Sections~6.1--6.2, and at $100$ m in the real-world case study of Section~6.4.
+The flight altitude is confined to $[h_{\min}, h_{\max}]=[50,150]$ m. The lower bound $50$ m matches the take-off/landing altitude, while the upper bound $150$ m is a representative operating ceiling for infrastructure-inspection missions: regulations permit altitudes above the $120$-m open-category limit when the UAV stays in close proximity to a structure (e.g., 14 CFR \S 107.51 allows flying up to 400 ft above a structure's top when within 400 ft of it~\cite{FAA-Part-107}).
 
 % \begin{figure*}%[]
 %   \centering
@@ -119,6 +123,18 @@ Even so, JHVSO reduces energy consumption by 1.9\%-3.9\% over ASSUME and by 4.3\
 
 In summary, throughout all 34 experimental configurations in Fig.~(\ref{fig:sim}), the proposed JHVSO method consistently maintains the lowest energy consumption footprint, reducing energy consumption by up to 14.8\% over the greedy speed-height baseline and by up to 5.1\% over the strongest competing baseline.
 
+\subsection{Discretization Sensitivity and Computational Cost}
+
+The global optimality guarantee of the proposed \textit{ORE} algorithm holds over the discretized state space, i.e., over the finite set of candidate states sampled within the communication region of each GN. Concretely, the continuous communication region of each GN is first rasterized onto a fine grid in the $(d,h)$ plane with a resolution of $1$ m, which yields the full set of candidate state points located inside the coverage region. When a GN contains more candidate points than a prescribed cap $M$, the points are uniformly subsampled in raster order---keeping every $s$-th point with $s=\lfloor N_c/M \rfloor$, where $N_c$ is the number of candidate points of that GN---so that approximately $M$ states remain; GNs whose coverage contains no more than $M$ candidate points keep all of them. As a result, the actual number of sampled states of each GN fluctuates around $M$ depending on its coverage area (on average approximately $2357$ and $5791$ states for $M=2000$ and $M=4000$, respectively). To assess the impact of this sampling resolution, we evaluate the algorithm under different caps $M \in \{250, 500, 1000, 2000, 4000\}$.
+
+\begin{figure*}%[]
+  \centering
+   \includegraphics[width = 1\linewidth]{figures/discretization-sensitivity.png}
+    \caption{Discretization sensitivity and computational cost. (a) Total energy, (b) running time, and (c) the relative optimality gap with respect to the finest resolution $M=4000$, versus the state sampling cap $M$. Each point is averaged over five random scenarios, with error bars denoting the standard deviation.}\label{fig:sensitivity}
+\end{figure*}
+
+As shown in Fig.~(\ref{fig:sensitivity})(a), the optimal energy decreases monotonically and converges as $M$ increases: refining $M$ from $1000$ to $4000$ reduces the total energy by only $0.14\%$, and the improvement shrinks as the resolution doubles, indicating approximately first-order convergence. At the operating resolution $M=2000$, the optimal energy is within $0.07\%$ of that obtained at $M=4000$ (Fig.~(\ref{fig:sensitivity})(c)); this residual gap reflects the discretization error of the state space and is negligible in practice, confirming that the discretized optimum has essentially converged to the continuous optimum. Meanwhile, as shown in Fig.~(\ref{fig:sensitivity})(b), the running time grows with $M$, averaging $4.86$ s at the operating resolution $M=2000$. Overall, a sampling cap in the range $M \in [1000, 2000]$ strikes a good balance between energy optimality and computational cost: the optimality gap is already only $0.14\%$ at $M=1000$ and $0.07\%$ at $M=2000$, while the running time remains modest.
+
 \subsection{Real World Scenario Case Study}
 
 \begin{figure}%[]
@@ -162,6 +178,8 @@ In the Gap segments, the UAV cruises at horizontal speeds of $13.92-13.96 m/s$ w
 In the Task segments, the UAV slows down to $6.95-12.89 m/s$, and the duration of each Task segment equals the required collection time of the corresponding GN.
 Notably, the transitions toward $GN_5$ and $GN_7$ contain no Gap segment, as the UAV has not yet left the communication coverage of the next GN upon finishing the previous collection task.
 Overall, the mission is completed in $278 s$, of which $85.1 s\ (\approx30 \%)$ is spent on inter-node cruising.
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

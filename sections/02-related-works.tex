@@ -30,7 +30,7 @@ Speed-related models instead capture the fact that the propulsion power is a con
 Zeng \etal~\cite{Rotary-Wing-UAV} derived the now-standard analytical model for rotary-wing UAVs, decomposing the power into blade-profile, induced, and parasite components, and Morbidi \etal~\cite{Minimum-energy-path-generation} reached a consistent model from the electrical dynamics of brushless DC motors.
 Building on this line, Gong \etal~\cite{GongHao} extended the flight energy consumption model to 3D flight by summing the hovering power with independent increments induced by the horizontal and vertical velocity components, and Liu \etal~\cite{PowerConsumptionModel} further characterized the vertical flight power from actuator-disk theory.
 Such speed-related models have been widely adopted in recent UAV-assisted edge computing and trajectory designs~\cite{Safe-and-Energy-Efficient-Trajectory, Energy-Efficient-UAV-Assisted-MEC}).
-However, existing 3D extensions treat the horizontal and vertical power as independent additive terms, whereas in practice the two are coupled through the rotor thrust and the induced airflow—a coupling that our flight energy consumption model accounts for explicitly.
+However, existing 3D extensions typically schedule the two dimensions independently (e.g., as discrete altitude transitions). In contrast, our formulation retains the additive instantaneous-power form of~\cite{GongHao, PowerConsumptionModel} but jointly optimizes the two speed components through the flight pitch angle, as detailed in Section 3.2.
 
 \subsection{Communication Models}
 
