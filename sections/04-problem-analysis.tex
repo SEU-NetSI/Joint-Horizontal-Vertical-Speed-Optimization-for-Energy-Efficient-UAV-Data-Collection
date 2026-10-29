@@ -5,7 +5,7 @@
 
 Before analyzing the \textit{JHVSO} problem, we first examine the flight energy consumption model and establish several properties that characterize energy-optimal UAV motion.
 
-We begin with the fundamental case in which a UAV flies between two given points.
+We begin with the point-to-point flight of a UAV between two given points, which is the building block of every segment of the trajectory.
 Even in this setting, minimizing flight energy is nontrivial because the horizontal and vertical velocity components must be jointly considered.
 To address this coupling, we exploit the convexity of the UAV flight energy consumption model to reduce the resulting functional optimization problem to a low-dimensional scalar search.
 
@@ -13,7 +13,7 @@ The following lemmas and theorems provide the theoretical basis for this reducti
 
 \begin{lemma}
 \label{lem:horizontal-constant-speed}
-Consider two points $A$ and $B$ at the same altitude ($\Delta H_{AB} = 0$) with horizontal distance $D_{AB}$.
+Consider two points $A$ and $B$ at the same altitude (the altitude difference between two points $\Delta H_{AB} = 0$) with horizontal distance $D_{AB}$.
 Among all horizontal speed profiles $v_{\parallel}(t) \ge 0$ that move the UAV from $A$ to $B$ within a time interval $\tau$, the constant-speed profile $v_{\parallel}^{*} \equiv D_{AB}/\tau$ is the unique energy minimizer.
 \end{lemma}
 
@@ -40,7 +40,7 @@ Among all horizontal speed profiles $v_{\parallel}(t) \ge 0$ that move the UAV f
 
 \begin{lemma}
 \label{lem:vertical-constant-speed}
-Consider two points $A$ and $B$ with altitude difference $\Delta H_{AB} \neq 0$ (climbing if $\Delta H_{AB} > 0$ and descending otherwise).
+Consider two points $A$ and $B$ with altitude difference $\Delta H_{AB} \neq 0$ (climbing if $\Delta H_{AB} > 0$, the horizontal distance between two points $\Delta D_{AB} = 0$ and descending otherwise).
 Among all vertical speed profiles that move the UAV from $A$ to $B$ within a time interval  $\tau$, the constant-speed profile $v_{\perp}^{*} \equiv \Delta H_{AB}/\tau$ is the unique energy minimizer.
 \end{lemma}
 
@@ -124,7 +124,7 @@ See Appendix~\ref{pro:Theorem optimal-range-speed}.
 \qed
 \end{proof}
 
-\begin{remark}[Piecewise constant-speed trajectories and dynamic feasibility]
+\begin{remark}[Feasibility of constant-speed trajectories]
 \label{rem:acc-dec}
     The resulting trajectory is piecewise constant-speed, with task segments flown per Remark~\ref{rem:task-speed} and gap segments per Theorem~\ref{thm:optimal-range-speed}, so consecutive segments may change velocity at their shared boundary. In practice, this change is realized by a brief acceleration/deceleration phase whose time and energy are only a small fraction of the total mission~\cite{msmo}; the constant speeds are therefore target cruise speeds tracked with short transition ramps, and full acceleration dynamics are left as future work.
 \end{remark}
@@ -214,9 +214,9 @@ We first make explicit the three system properties on which the dynamic programm
     This completes the proof.\qed
 \end{proof}
 
-\begin{remark}[Role of the no-deadline assumption]
+\begin{remark}[Possibility of removing Assumption A2]
 \label{rem:deadline}
-    Assumption A2 is essential to Theorem~\ref{thm:aftereffect}: with a global deadline $T \le T_{\max}$, the feasibility of an outbound path would depend on the elapsed time, so each DP state would need to be augmented with a time dimension, and the overall algorithm would have to be revisited accordingly. The no-deadline assumption is therefore deliberate, as it keeps the state space low-dimensional and enables the efficient stage-wise recurrence; extending the framework to deadline-constrained missions is left as future work.
+    Ass-umption A2 can in principle be removed by imposing a global mission deadline $T \le T_{\max}$. This, however, would break the non-aftereffect property of Theorem~\ref{thm:aftereffect}: the feasibility of an outbound path would then depend on the elapsed time, so each DP state would need to be augmented with a time dimension, and the overall algorithm would have to be revisited accordingly. We therefore retain A2 in the present work to keep the state space low-dimensional and the stage-wise recurrence efficient, and we will incorporate this deadline constraint in a future work.
 \end{remark}
 
 \begin{corollary}[Energy additivity]\label{cor:en_add}

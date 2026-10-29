@@ -24,7 +24,7 @@ In each controlled experiment, only the default value of the scanned parameter i
 \midrule
  Average\ $PL\ (dB)$ & 85  & [83 86]\\
  Average\ $D_i\ (Mbit)$ & 88 & [72 100]\\
- Nominal\ SINR\ $\gamma_i$ & 15 & [12 18]\\
+ Nominal\ SINR\ $\Gamma_i$ & 15 & [12 18]\\
  Parameter\ $\mu _{LoS}\ (dB)$& 1.3 & [1 1.6]\\
  Parameter\ $\mu _{NLoS}\ (dB)$& 35 & -\\
  Average distance\ $(m)$& 60 & [30 80]\\
@@ -42,7 +42,7 @@ The probability of establishing an LoS link depends heavily on the elevation ang
 The wireless communication operates at a standard carrier frequency of $f = 2.4 GHz$, with the speed of light defined as $c = 3 \times 10^8$ m/s.
 The average excessive path losses for LoS and Non-Line-of-Sight (NLoS) connections are configured as $\mu_{LoS} = 1.3$ dB and $\mu_{NLoS} = 35$ dB, respectively.
 A communication link is deemed valid and available for data upload if and only if the total path loss remains below a maximum allowable threshold of $PL = 85$ dB, which defines the continuous geometric coverage boundary shape for each GN.
-The data upload adopts a channel bandwidth of $B = 1$ MHz and a per-GN nominal SINR $\gamma_i$ sampled from $[12, 18]$ (default $15$), which yields a constant achievable rate $\bar{R}_i = B\log_2(1+\gamma_i)$, about $4$ Mbps at the default. The required collection duration is then $\tau_i = D_i/\bar{R}_i$, which is approximately $22$ s on average under the default data volume $D_i = 88$ Mbit.
+The data upload adopts a channel bandwidth of $B = 1$ MHz and a per-GN nominal SINR $\Gamma_i$ sampled from $[12, 18]$ (default $15$), which yields a constant achievable rate $\bar{R}_i = B\log_2(1+\Gamma_i)$, about $4$ Mbps at the default. The required collection duration is then $\tau_i = D_i/\bar{R}_i$, which is approximately $22$ s on average under the default data volume $D_i = 88$ Mbit.
 
 Each experimental configuration is repeated over $K = 5$ independent trials.
 In every trial, the GN positions and the per-GN parameters are re-sampled uniformly from the variation ranges listed in \textit{Table.\ref{tbl:parameters}}, and the reported energy is the average over the $K$ trials.
@@ -75,15 +75,15 @@ We compare our proposed method with following base-line algorithms
 \begin{figure*}%[]
   \centering
    \includegraphics[width = 1.\linewidth]{figures/simulation-comparison.png}
-    \caption{The UAV energy consumption of different algorithm.
-    In (a), as the average path loss threshold getting larger, the energy consumption of all methods fluctuates with the increase of parameters, but the overall energy consumption for each method is basically unchanged.
-    In (b), with the increasing in the environment parameter $b$ , all methods have the decrease in energy consumption at first ,then the energy consumption of all methods gradually stabilized after the parameters rose to a certain extent.
-    In (c), the energy consumption for each methods increases constantly with more ground nodes are added to the mission.
+    \caption{The UAV energy consumption of different algorithms.
+    In (a), as the environment parameter $a$ --- equivalently, the elevation angle at which the LoS probability reaches $50\%$, given by $a+\ln(a)/b$ --- increases from 40 to 50 (from street canyons to extremely dense high-rise districts), the coverage region of each GN shrinks and the energy consumption of JHVSO, ASSUME, MSMO and noSpeedAltitude increases monotonically, with the increase steepening for $a\ge46$; the margin of JHVSO over MSMO widens from 3.6\% to 6.6\%.
+    In (b), as the environment parameter $b$ increases, all methods first decrease in energy consumption and then stabilize once the LoS probability approaches its upper limit, with ACO and noSpeedAltitude showing minor non-monotonic wiggles.
+    In (c), the energy consumption for each method increases constantly with more ground nodes added to the mission.
     In (d), all methods have the increase in energy consumption as the average time to complete data collection from one ground node increases.
-    (e) and (f), show the results of how energy consumption of all methods changes if the distance between each ground nodes increases.
-    For (e), the $\tau$ remain the default value in all groups of experiments, and we can see that all methods have decrease in energy consumption if the average distance between GNs is less than 60 ,after that the MSMO and ACO methods have the increase.
-    For (f), the $\tau$ getting larger with the distance increases , we can see that the energy consumption for all methods increases.
-    JHVSO achieves the lowest energy consumption in all 34 configurations, reducing energy by 1.8\%--5.1\% over the strongest baseline (ASSUME), 3.3\%--9.2\% over ACO, and 4.2\%--14.8\% over the greedy speed--height baseline (noSpeedAltitude).}\label{fig:sim}
+    (e) and (f) show how the energy consumption of all methods changes as the distance between adjacent ground nodes increases.
+    For (e), $\tau$ remains at its default value: the energy of JHVSO, ASSUME, ACO and noSpeedAltitude first decreases slightly (by about 2\%, with the minimum at an average distance of 60 m) and then increases, whereas MSMO rises monotonically, so that the margin of JHVSO over MSMO widens from 2.6\% at 40 m to 8.3\% at 90 m.
+    For (f), $\tau$ grows proportionally with the distance, and the energy consumption of all methods increases monotonically.
+    JHVSO achieves the lowest energy consumption in all 34 configurations, reducing energy by 1.7\%--5.8\% over the strongest baseline (ASSUME), 1.9\%--12.9\% over MSMO, 2.7\%--10.7\% over ACO, and 3.4\%--16.8\% over the greedy speed--height baseline (noSpeedAltitude).}\label{fig:sim}
 \end{figure*}
 \subsection{Simulation Results and Comparative Analysis}
 
@@ -91,49 +91,75 @@ We compare our proposed method with following base-line algorithms
 Fig.~(\ref{fig:sim}) presents a comprehensive performance evaluation of the proposed \textit{JHVSO} algorithm alongside four baseline methods: ASSUME, MSMO, ACO, and noSpeedAltitude.
 
 To thoroughly investigate the adaptability and robustness of these algorithms under diverse operational environments, we conduct six controlled experiments following the protocol of \textit{Table 1}: in each subfigure, the x-axis denotes the varied default value of the corresponding parameter, while the per-GN randomization within the variation ranges of \textit{Table 1} is preserved.
+Each configuration is evaluated on three independent random instances, and the reported value is the average over the three instances.
+To isolate the effect of the swept parameter from instance-to-instance fluctuations, the same random instances are reused across all sweep points of an experiment (common random numbers) so that only the swept parameter differs between neighboring points of a curve.
 
-In Fig.~(\ref{fig:sim})(a),  we compare the energy consumption of different methods as the average path loss threshold $PL$  increases from $82.5 dB$ to $85 dB$.
-The path loss threshold defines the spatial extent of the communication coverage.
-As shown in the figure, the energy consumption of every method fluctuates slightly with $PL$  but remains essentially unchanged overall, indicating that once the coverage is sufficiently large to accommodate feasible collection windows, further relaxing the threshold brings marginal benefit to energy-optimal scheduling.
-The residual fluctuation is attributable to the per-GN randomization of the deployment rather than to any systematic trend.
-Notably, the relative ranking of the five methods is stable across all threshold settings, with the proposed JHVSO algorithm consistently achieving the lowest energy consumption. 
-Quantitatively, JHVSO reduces energy consumption by 1.8\%-3.0\% over ASSUME (the strongest competing baseline), by 3.6\%-4.8\ over ACO, and by 4.7\%-6.9\% over the greedy noSpeedAltitude baseline; the largest margin occurs at $PL=84.5$ dB, where JHVSO consumes $1.61\times10^{5}$ J against $1.73\times10^{5}$ J of noSpeedAltitude, i.e., a 6.9\% energy saving.
+In Fig.~(\ref{fig:sim})(a), we evaluate the energy consumption as the environment parameter $a$ increases from 40 to 50.
+Here the elevation angle $\theta=\arctan(h/d)$ measures how steeply the UAV looks down at a GN: $\theta=90^{\circ}$ corresponds to hovering directly overhead, while a small $\theta$ corresponds to a grazing link that has to pass through the surrounding buildings.
+Buildings therefore block the link at low elevations, so that the LoS probability follows the S-curve of Eq.~(\ref{equ:PL}) and reaches $50\%$ at $\theta_{50}=a+\ln(a)/b$; at the nominal value $b=0.25$, $\theta_{50}$ rises from about $55^{\circ}$ to about $66^{\circ}$ as $a$ increases from 40 to 50, which means that at a flight height of 100 m the horizontal distance at which a link is equally likely to be LoS or NLoS decreases from about 70 m to about 45 m (the actual coverage boundary lies somewhat above $\theta_{50}$ because the NLoS excess loss is large).
+A larger $a$ therefore corresponds to a harsher propagation environment, in which the coverage region of each GN is smaller and the feasible collection windows are tighter.
+As shown in the figure, the energy consumption of JHVSO, ASSUME, MSMO and noSpeedAltitude increases monotonically with $a$, while ACO exhibits a minor fluctuation at $a=46$ due to its randomized search.
+For JHVSO the increase is gradual below $a=44$ ($+0.1\%$ and $+0.4\%$ per 2-unit step) and steepens for $a\ge46$ ($+0.8\%$, $+1.7\%$ and $+2.7\%$ per step), reflecting the accelerating shrinkage of the coverage regions.
+The relative ranking of the five methods is stable across all settings, with the proposed JHVSO algorithm consistently achieving the lowest energy consumption.
+Quantitatively, JHVSO reduces energy consumption by 2.8\%--2.9\% over ASSUME (the strongest competing baseline), by 3.6\%--6.7\% over MSMO, by 3.1\%--6.0\% over ACO, and by 6.3\%--7.4\% over the greedy noSpeedAltitude baseline; the largest saving occurs at $a=40$, where JHVSO consumes $1.57\times10^{5}$ J against $1.69\times10^{5}$ J of noSpeedAltitude, i.e., a 7.4\% energy saving.
+Notably, the margin over MSMO grows from 3.6\% at $a=40$ to 6.6\% at $a=50$, indicating that the advantage of joint speed-altitude optimization becomes more pronounced as the environment deteriorates.
 
-In Fig.~(\ref{fig:sim})(b), demonstrates the effect of the environmental parameter $b$, which conrtols the sensitivity of $LoS$ probability to the elevation angle in Eq.~(\ref{equ:PL}).
-An increase in $b$  raises the $LoS$ probability at a given elevation angle and thereby effectively expands the communication coverage, providing the UAV with larger feasible windows for data collection.
-Consequently, the energy consumption of all methods first decreases as $b$  grows from 0.2 to 0.26.
-Beyond this point, however, the $LoS$ probability gradually saturates—as the sigmoid in Eq.~(\ref{equ:PL}) approaches its upper limit—so that the coverage barely expands any further and the energy consumption of all methods stabilizes.
-Throughout this sweep, JHVSO maintains the lowest energy footprint, reducing consumption by 2.4\%-3.0\% over ASSUME, by 3.0\%-5.3\% over MSMO, and by 5.8\%-7.1\% over noSpeedAltitude; the peak reduction of 7.1\% is observed at $b=0.3$ ($1.58\times10^{5}$ J versus$1.70\times10^{5}$ J).
+In Fig.~(\ref{fig:sim})(b), we examine the effect of the environmental parameter $b$, which controls the sensitivity of the LoS probability to the elevation angle in Eq.~(\ref{equ:PL}).
+An increase in $b$  raises the LoS probability at a given elevation angle and thereby effectively expands the communication coverage, providing the UAV with larger feasible windows for data collection.
+Consequently, the energy consumption of all methods first decreases as $b$  grows: for JHVSO the drop is 3.1\% at the first step ($b=0.22$) and 1.4\% at $b=0.24$.
+Beyond this point, however, the $LoS$ probability gradually saturates---as the sigmoid in Eq.~(\ref{equ:PL}) approaches its upper limit---so that the coverage barely expands any further and the energy consumption of JHVSO and ASSUME remains virtually flat up to $b=0.3$.
+The small non-monotonic wiggles of ACO and noSpeedAltitude (e.g., noSpeedAltitude turns upward after $b=0.26$) stem from their altitude-selection heuristics, which respond to the enlarged coverage by shifting to higher cruising altitudes and thus incurring extra climb and descent costs.
+Throughout this sweep, JHVSO maintains the lowest energy footprint, reducing consumption by 2.8\%--3.0\% over ASSUME, by 3.9\%--6.3\% over MSMO, and by 6.1\%--7.9\% over noSpeedAltitude; the peak reduction of 7.9\% is observed at $b=0.3$ ($1.55\times10^{5}$ J versus $1.67\times10^{5}$ J).
 
 As depicted in Fig.~(\ref{fig:sim})(c) and Fig.~(\ref{fig:sim})(d), the energy consumption of all evaluated methods scales upward under increasing mission workloads.
 Specifically, Fig.~(\ref{fig:sim})(c) shows a monotonic rise in total energy expenditure as more GNs are integrated into the flight mission.
-across alldeployment scales from 20 to 40 GNs, ORE reduces energy consumption by 1.9\%-3.0\% over ASSUME, by 3.9\%-4.8\% over ACO, and by 4.2\%-7.0\% over noSpeedAltitude, with the largest gain (7.0\%) achieved at the 20-GN scale ($1.60\times10^{5}$ J versus $1.72\times10^{5}$ J). 
+Across all deployment scales from 20 to 40 GNs, JHVSO reduces energy consumption by 1.8\%--2.7\% over ASSUME, by 3.4\%--5.6\% over MSMO, by 3.8\%--5.8\% over ACO, and by 4.0\%--7.1\% over noSpeedAltitude, with the largest gain (7.1\%) achieved at the 20-GN scale ($1.59\times10^{5}$ J versus $1.70\times10^{5}$ J).
 Similarly, Fig.~(\ref{fig:sim})(d) indicates that extending the average minimum required data collection time ($\tau$) per GN intrinsically demands prolonged flight or hovering durations, thereby consistently elevating the overall energy consumption across all algorithms.
-This setting yields the most pronounced relative advantage of JHVSO among all experiments: the energy reduction reaches 5.1\% over ASSUME, 9.2\% over ACO, and 14.8\% over noSpeedAltitude at $\tau=10$ s ($6.35\times10^{4}$ J versus $6.69\times10^{4}$ J, $6.99\times10^{4}$ J, and $7.45\times10^{4}$ J, respectively). As $\tau$ grows to 30 s, the collection time progressively dominates the total mission energy, so the relative margins narrow to 2.3\% (ASSUME) and 5.7\% (noSpeedAltitude), yet JHVSO remains the most energy-efficient method at every data point.
+This setting yields the most pronounced relative advantage of JHVSO among all experiments: at $\tau=10$ s the energy reduction reaches 5.8\% over ASSUME, 12.9\% over MSMO, 10.7\% over ACO, and 16.8\% over noSpeedAltitude ($6.32\times10^{4}$ J versus $6.69\times10^{4}$ J, $7.14\times10^{4}$ J, $7.00\times10^{4}$ J, and $7.39\times10^{4}$ J, respectively). As $\tau$ grows to 30 s, the collection time progressively dominates the total mission energy, so the relative margins narrow to 2.3\% (ASSUME), 4.2\% (MSMO), 2.7\% (ACO), and 5.5\% (noSpeedAltitude), yet JHVSO remains the most energy-efficient method at every data point.
 
 Fig.~(\ref{fig:sim})(e) and Fig.~(\ref{fig:sim})(f) explore the algorithmic performance as the average distance between GNs increases.
 In Fig.~(\ref{fig:sim})(e), the required task time $\tau$ is kept constant.
 As the inter-node distance grows, the UAV is compelled to increase its average transit speed, which better aligns with the optimal aerodynamic cruising speed.
-Provided the gap segments between nodes are not excessively long, the total mission duration remains relatively stable, allowing the proposed method, ASSUME, and noSpeedAltitude to achieve continued energy reductions.
-Conversely, MSMO and ACO exhibit a performance degradation when the average distance exceeds 60 m, indicating a higher susceptibility to suboptimal scheduling within extended gap segments.
-JHVSO's advantage over MSMO widens from 3.7\% at 60 m to 6.7\% at 80-90 m. Over the whole sweep, JHVSO reduces energy consumption by 2.5\%-3.6\% over ASSUME and by 6.6\%-8.1\% over noSpeedAltitude, with the maximum saving of 8.1\% occurring at the 40 m spacing ($1.59\times10^{5}$ J versus $1.73\times10^{5}$ J).
+For small spacings, the coverage regions of adjacent GNs still overlap, so that the collection segment itself covers the entire transition and the energy consumption of JHVSO, ASSUME, ACO and noSpeedAltitude decreases slightly (by about 2\%) and reaches its minimum at an average distance of 60 m.
+Beyond 60 m, the coverage regions separate, so that the UAV has to cruise outside the coverage in the gaps between nodes; this additional distance outweighs the speed benefit and the energy consumption of these four methods rises again.
+MSMO, in contrast, exhibits a monotonic performance degradation over the entire range, indicating a higher susceptibility to suboptimal scheduling within extended gap segments.
+Consequently, JHVSO's advantage over MSMO widens from 2.6\% at 40 m to 8.3\% at 90 m, while its margin over ASSUME remains at about 3.1\%--3.4\% and its margin over noSpeedAltitude at about 7.3\%--7.8\% throughout the sweep.
 In Fig.~(\ref{fig:sim})(f), $\tau$ scales proportionally with the inter-node distance (fixed ratio of 0.5).
 Under this coupled constraint, the extended spatial traversal strictly mandates a correspondingly longer mission duration, resulting in a predictable and consistent increase in energy consumption across all methods.
-Even so, JHVSO reduces energy consumption by 1.9\%-3.9\% over ASSUME and by 4.3\%-8.1\% over noSpeedAltitude, again peaking at 8.1\% for the 40 m spacing ($1.48\times10^{5}$ J versus $1.61\times10^{5}$ J).
+Even so, JHVSO reduces energy consumption by 1.7\%--2.4\% over ASSUME, by 1.9\%--4.0\% over MSMO, and by 3.4\%--7.0\% over noSpeedAltitude, again peaking at 7.0\% for the 40 m spacing ($1.57\times10^{5}$ J versus $1.68\times10^{5}$ J).
 
-In summary, throughout all 34 experimental configurations in Fig.~(\ref{fig:sim}), the proposed JHVSO method consistently maintains the lowest energy consumption footprint, reducing energy consumption by up to 14.8\% over the greedy speed-height baseline and by up to 5.1\% over the strongest competing baseline.
+In summary, throughout all 34 experimental configurations in Fig.~(\ref{fig:sim}), the proposed JHVSO method consistently maintains the lowest energy consumption footprint, reducing energy consumption by up to 16.8\% over the greedy speed-height baseline and by up to 5.8\% over the strongest competing baseline (ASSUME).
 
 \subsection{Discretization Sensitivity and Computational Cost}
 
 The global optimality guarantee of the proposed \textit{ORE} algorithm holds over the discretized state space, i.e., over the finite set of candidate states sampled within the communication region of each GN. Concretely, the continuous communication region of each GN is first rasterized onto a fine grid in the $(d,h)$ plane with a resolution of $1$ m, which yields the full set of candidate state points located inside the coverage region. When a GN contains more candidate points than a prescribed cap $M$, the points are uniformly subsampled in raster order---keeping every $s$-th point with $s=\lfloor N_c/M \rfloor$, where $N_c$ is the number of candidate points of that GN---so that approximately $M$ states remain; GNs whose coverage contains no more than $M$ candidate points keep all of them. As a result, the actual number of sampled states of each GN fluctuates around $M$ depending on its coverage area (on average approximately $2357$ and $5791$ states for $M=2000$ and $M=4000$, respectively). To assess the impact of this sampling resolution, we evaluate the algorithm under different caps $M \in \{250, 500, 1000, 2000, 4000\}$.
 
-\begin{figure*}%[]
+\begin{table*}[]
+\caption{Total energy and relative improvement of each of the five experiments under different state sampling caps $M$. The relative improvement columns report the percentage reduction in energy when the cap is refined to the next resolution, e.g., $(E_{250}-E_{500})/E_{250}$. The energy decreases monotonically and converges as $M$ increases, with only a small difference across the resolutions.}\label{tbl:sensitivity}
+\begin{tabular*}{\textwidth}{l ccccc cccc}
+\toprule
+ & \multicolumn{5}{c}{Total energy (J)} & \multicolumn{4}{c}{Relative improvement (\%)} \\
+\cmidrule(lr){2-6} \cmidrule(lr){7-10}
+ Exp & $M=250$ & $M=500$ & $M=1000$ & $M=2000$ & $M=4000$ & $250\!\to\!500$ & $500\!\to\!1000$ & $1000\!\to\!2000$ & $2000\!\to\!4000$ \\
+\midrule
+ Exp.\ 1 & 153946 & 153558 & 153370 & 153315 & 153178 & 0.2520 & 0.1224 & 0.0361 & 0.0895 \\
+ Exp.\ 2 & 162798 & 162207 & 162005 & 161858 & 161742 & 0.3630 & 0.1243 & 0.0907 & 0.0717 \\
+ Exp.\ 3 & 151038 & 150486 & 150338 & 150171 & 150078 & 0.3657 & 0.0982 & 0.1107 & 0.0625 \\
+ Exp.\ 4 & 153148 & 152940 & 152693 & 152600 & 152535 & 0.1363 & 0.1612 & 0.0609 & 0.0428 \\
+ Exp.\ 5 & 155466 & 155100 & 155092 & 155001 & 154873 & 0.2359 & 0.0052 & 0.0584 & 0.0824 \\
+\midrule
+ Mean & 155279 & 154858 & 154700 & 154589 & 154481 & 0.2706 & 0.1023 & 0.0714 & 0.0698 \\
+\bottomrule
+\end{tabular*}
+\end{table*}
+
+\begin{figure}%[]
   \centering
    \includegraphics[width = 1\linewidth]{figures/discretization-sensitivity.png}
-    \caption{Discretization sensitivity and computational cost. (a) Total energy, (b) running time, and (c) the relative optimality gap with respect to the finest resolution $M=4000$, versus the state sampling cap $M$. Each point is averaged over five random scenarios, with error bars denoting the standard deviation.}\label{fig:sensitivity}
-\end{figure*}
+    \caption{Discretization sensitivity and computational cost. (a) Running time and (b) the relative optimality gap with respect to the finest resolution $M=4000$, versus the state sampling cap $M$. Each point is averaged over five random scenarios, with error bars denoting the standard deviation.}\label{fig:sensitivity}
+\end{figure}
 
-As shown in Fig.~(\ref{fig:sensitivity})(a), the optimal energy decreases monotonically and converges as $M$ increases: refining $M$ from $1000$ to $4000$ reduces the total energy by only $0.14\%$, and the improvement shrinks as the resolution doubles, indicating approximately first-order convergence. At the operating resolution $M=2000$, the optimal energy is within $0.07\%$ of that obtained at $M=4000$ (Fig.~(\ref{fig:sensitivity})(c)); this residual gap reflects the discretization error of the state space and is negligible in practice, confirming that the discretized optimum has essentially converged to the continuous optimum. Meanwhile, as shown in Fig.~(\ref{fig:sensitivity})(b), the running time grows with $M$, averaging $4.86$ s at the operating resolution $M=2000$. Overall, a sampling cap in the range $M \in [1000, 2000]$ strikes a good balance between energy optimality and computational cost: the optimality gap is already only $0.14\%$ at $M=1000$ and $0.07\%$ at $M=2000$, while the running time remains modest.
+As shown in Table~\ref{tbl:sensitivity}, the total energy of every experiment decreases monotonically and converges as $M$ increases. On average, refining $M$ from $1000$ to $4000$ reduces the total energy by only $0.14\%$, and the improvement shrinks as the resolution doubles, indicating approximately first-order convergence (Fig.~(\ref{fig:sensitivity})(b)). At the operating resolution $M=2000$, the optimal energy is within $0.07\%$ of that obtained at $M=4000$; this residual gap reflects the discretization error of the state space and is negligible in practice, confirming that the discretized optimum has essentially converged to the continuous optimum. Meanwhile, as shown in Fig.~(\ref{fig:sensitivity})(a), the running time grows with $M$, averaging $4.86$ s at the operating resolution $M=2000$. Overall, a sampling cap in the range $M \in [1000, 2000]$ strikes a good balance between energy optimality and computational cost. Notably, even the coarsest resolution $M=250$ is only about $0.5\%$ above the finest $M=4000$, confirming that the discretization resolution has only a marginal impact on the optimal energy and mainly affects the computational cost.
 
 \subsection{Real World Scenario Case Study}
 

@@ -5,7 +5,7 @@
 \subsection{Ground-to-Air Communication Model}
 
 We consider a set of ground nodes (GNs) denoted by $\mathcal{N} = \{1, 2, \dots, n\}$, distributed along a pre-defined flight mission path,  such as bridges and railways, water, gas, and oil pipelines, and rivers and coastlines. 
-Each  $GN_i \ ,\ i\in \mathcal{N}$ is located at a fixed position and has a specific volume of data to be collected by the UAV.
+Each  $GN_i \ ,\ i\in \mathcal{N}$ is located at a fixed position and has a specific volume of data $D_i,\ i\in \mathcal{N} $ to be collected by the UAV.
 The smaller the index of the $GN$ means closer to the start point of the flight path.
 
 Following the practical ground-to-air communication model established in~\cite{CommunicationModel}, the communication range of a $GN$ is determined by the two-dimensional distance between the $GN$ and the UAV. 
@@ -32,14 +32,14 @@ The constant $M$ collects the carrier-frequency and free-space propagation facto
 \end{equation}
 where $f$ is the carrier frequency and $c$ is the speed of light.
 
-The key angular variable is the link elevation angle $\theta_i=\frac{180}{\pi}\arctan(h_i/r_i)$ (in degrees), measured between the GN--UAV line and the horizontal plane.
+The key angular variable is the link elevation angle $\theta_i=180/\pi\cdot \arctan(h_i/r_i)$ (in degrees), measured between the GN--UAV line and the horizontal plane.
 It determines the LoS probability $P_{LoS}(\theta_i)=1/(1+a\exp(-b[\theta_i-a]))$: a larger $\theta_i$ increases the LoS probability and thus reduces the expected excess loss when $\mu_{LoS}<\mu_{NLoS}$.
 However, at a fixed horizontal distance, increasing altitude also lengthens the slant range $d_i=\sqrt{h_i^2+r_i^2}$ and increases the free-space loss.
 These competing effects determine the altitude-dependent communication region defined by $PL_i(r_i,h_i)\leq PL_i^{max}$, as illustrated in Fig.~(\ref{fig:communication_range}).
 
-To model the data upload, we characterize each $GN_i$ by a nominal SINR $\gamma_i$, which is a per-node design parameter given in advance---like the path-loss threshold $PL_i^{max}$---rather than the instantaneous, position-dependent SINR experienced by the UAV. Letting $B$ denote the channel bandwidth, the achievable rate of the link is evaluated at this nominal SINR through the Shannon capacity:
+To model the data upload, we characterize each $GN_i$ by a nominal SINR $\Gamma_i$, which is a per-node design parameter given in advance---like the path-loss threshold $PL_i^{max}$---rather than the instantaneous, position-dependent SINR experienced by the UAV. Letting $B$ denote the channel bandwidth, the achievable rate of the link is evaluated at this nominal SINR through the Shannon capacity:
 \begin{equation}
-    \bar{R}_i = B\log_2(1+\gamma_i). \label{equ:const_rate}
+    \bar{R}_i = B\log_2(1+\Gamma_i). \label{equ:const_rate}
 \end{equation}
 Each $GN_i$ therefore uploads data at the constant rate $\bar{R}_i$ throughout the collection phase, which yields the deterministic collection duration $\tau_i = D_i/\bar{R}_i$.
 
@@ -47,7 +47,7 @@ Each $GN_i$ therefore uploads data at the constant rate $\bar{R}_i$ throughout t
   \centering
    \includegraphics[width = 1\linewidth]{figures/gn-communication-range-3d.png}
     \caption{Altitude-dependent communication regions defined by Eq.~(\ref{equ:PL}) and Eq.~(\ref{equ:M}).
-    The UAV must remain within the region of $GN_i$ for the required data collection duration $\tau_i = D_i/\bar{R}_i$, where $D_i$ is the data volume of $GN_i$ and $\bar{R}_i = B\log_2(1+\gamma_i)$ is the constant achievable rate.}\label{fig:communication_range}
+    The UAV must remain within the region of $GN_i$ for the required data collection duration $\tau_i = D_i/\bar{R}_i$, where $D_i$ is the data volume of $GN_i$ and $\bar{R}_i = B\log_2(1+\Gamma_i)$ is the constant achievable rate.}\label{fig:communication_range}
 \end{figure}
 
 The link elevation angle differs from the UAV's flight-path angle, which describes the direction of its velocity.
@@ -56,7 +56,7 @@ This geometric dependence couples speed and altitude scheduling with the require
 
 \subsection{Flight Energy Consumption Model}
 
-To optimize the UAV's horizontal and vertical speeds for energy-efficient data collection, we first model its propulsion power as a function of these two velocity components.
+To optimize the UAV's horizontal and vertical speeds for energy-efficient data collection, we first characterize its propulsion power consumption.
 Following~\cite{GongHao}, we express the total power as the hovering power plus the increments associated with horizontal and vertical motion.
 
 \begin{figure}[]
@@ -69,12 +69,9 @@ Following~\cite{GongHao}, we express the total power as the hovering power plus 
 \end{figure}
 
 Let $V_{total}$ denote the total (resultant) flight speed and $\gamma$ the flight pitch angle, defined as the angle between the velocity vector and the horizontal plane. The horizontal and vertical velocity components are related to $V_{total}$ and $\gamma$ by
-\[
-    V_{\parallel} = V_{total}\cos\gamma, \qquad V_{\perp} = V_{total}\sin\gamma.
-\]
 
 \begin{equation}
-    P_{total}(V_{total}) = P_{mh} + \Delta P_{\parallel}(V_{\parallel}) + \Delta P_{\perp}(V_{\perp}),
+    P_{total}(V_{total}) = P_{mh} + \Delta P_{\parallel}(V_{total}\cos\gamma) + \Delta P_{\perp}(V_{total}\sin\gamma),
     \label{equ:e_1}
 \end{equation}
 
@@ -159,12 +156,13 @@ The total flight energy follows directly from the decoupled flight energy consum
 where $T$ is the total mission time.
 
 \begin{definition}[JHVSO problem]\label{def:JHVSO}
-    Given ordered ground nodes $GN_1,\ldots,GN_N$, their communication regions, and the data volume $D_i$ of each $GN_i$, the \textit{JHVSO} problem seeks a trajectory $q(t)=(d(t),h(t))$ and collection intervals that minimize the total flight energy in Eq.~(\ref{equ:Etotoal}).
+    Given ordered nodes $GN_1$ $,\ldots,GN_N$, their communication regions, and the data volume $D_i$ of each $GN_i$, the \textit{JHVSO} problem seeks a trajectory $q(t)=(d(t),h(t))$ and collection intervals that minimize the total flight energy in Eq.~(\ref{equ:Etotoal}).
     Under the constant achievable rate $\bar{R}_i$ in Eq.~(\ref{equ:const_rate}), collecting the data volume $D_i$ requires a duration $\tau_i = D_i/\bar{R}_i$; the collection of $GN_i$ is successful if and only if the UAV stays within its communication region for a total duration of at least $\tau_i$.
     The UAV must serve the nodes in order, collecting from one node at a time, and fly from the prescribed initial position at altitude $h_0$ to a point within the last node's communication region and an altitude of $h_f$.
     The flight altitude is additionally bounded by $h_{\min} \le h(t) \le h_{\max}$, where $h_{\min}$ and $h_{\max}$ are the lower and upper altitude limits.
 \end{definition}
 
 The starting altitude $h_{0}$ and final altitude $h_f$ are exogenous mission parameters specified per scenario.
+The energies consumed during takeoff, the initial climb to $h_0$, the final descent from $h_f$, and landing are fixed one-time costs: since $h_0$ and $h_f$ are exogenous, these costs are additive constants that do not affect the optimal trajectory, and are therefore excluded from $E_{total}$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
