@@ -37,7 +37,7 @@ It determines the LoS probability $P_{LoS}(\theta_i)=1/(1+a\exp(-b[\theta_i-a]))
 However, at a fixed horizontal distance, increasing altitude also lengthens the slant range $d_i=\sqrt{h_i^2+r_i^2}$ and increases the free-space loss.
 These competing effects determine the altitude-dependent communication region defined by $PL_i(r_i,h_i)\leq PL_i^{max}$, as illustrated in Fig.~(\ref{fig:communication_range}).
 
-To model the data upload, we characterize each $GN_i$ by a nominal SINR $\Gamma_i$, which is a per-node design parameter given in advance---like the path-loss threshold $PL_i^{max}$---rather than the instantaneous, position-dependent SINR experienced by the UAV. Letting $B$ denote the channel bandwidth, the achievable rate of the link is evaluated at this nominal SINR through the Shannon capacity:
+To model the data upload, we characterize each $GN_i$ by a nominal SINR $\Gamma_i$, a per-node parameter analogous to the path-loss threshold $PL_i^{max}$. Letting $B$ denote the channel bandwidth, the achievable rate of the link is evaluated at this nominal SINR through the Shannon capacity:
 \begin{equation}
     \bar{R}_i = B\log_2(1+\Gamma_i). \label{equ:const_rate}
 \end{equation}
